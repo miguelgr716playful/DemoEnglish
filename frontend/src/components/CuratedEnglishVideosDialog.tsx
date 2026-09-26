@@ -1,11 +1,8 @@
 import { useEffect } from 'react'
 import { ChevronDown, ExternalLink, ListVideo, X } from 'lucide-react'
 import { curatedEnglishVideoTopics } from '../data/curatedEnglishVideos'
+import { youtubeWatchUrl } from '../lib/youtubeEmbed'
 import { YoutubeTranscriptDisclosure } from './YoutubeTranscriptDisclosure'
-
-function youtubeWatchUrl(videoId: string) {
-  return `https://www.youtube.com/watch?v=${videoId}`
-}
 
 type CuratedEnglishVideosDialogProps = {
   open: boolean

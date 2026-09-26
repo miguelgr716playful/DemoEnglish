@@ -3,6 +3,9 @@
     "rewrite": "/index.html",
     "exclude": ["/api/*", "*.{css,js,png,jpg,jpeg,gif,svg,ico,webp,woff,woff2}"]
   },
+  "globalHeaders": {
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  },
   "routes": [
     {
       "route": "/api/*",

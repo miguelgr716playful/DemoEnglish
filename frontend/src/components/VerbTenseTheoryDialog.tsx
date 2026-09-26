@@ -7,11 +7,8 @@ import {
   verbTenseTheoryFeaturedVideo,
   type TenseTheoryYoutube,
 } from '../data/verbTenseTheory'
+import { youtubeEmbedUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
 import { YoutubeTranscriptDisclosure } from './YoutubeTranscriptDisclosure'
-
-function youtubeWatchUrl(videoId: string) {
-  return `https://www.youtube.com/watch?v=${videoId}`
-}
 
 function TenseTheoryYoutubeDetails({
   video,
@@ -37,11 +34,12 @@ function TenseTheoryYoutubeDetails({
         <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
           <iframe
             className="h-full w-full"
-            src={`https://www.youtube-nocookie.com/embed/${video.videoId}`}
+            src={youtubeEmbedUrl(video.videoId)}
             title={title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
           />
         </div>
         <a
