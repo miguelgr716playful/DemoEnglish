@@ -107,7 +107,7 @@ dotnet user-secrets set "OpenAI:ChatModel" "gpt-4o-mini"
 
 ## Azure Functions (SWA)
 
-Carpeta [`api/`](api/): worker **.NET isolated** con las mismas rutas, reutilizando Application + Infrastructure.
+Carpeta [`api/`](api/): worker **.NET 8 isolated** (compatible con SWA managed) con las mismas rutas, reutilizando Application + Infrastructure (`net8.0` / `net10.0`).
 
 ```bash
 cd api
