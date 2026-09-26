@@ -1,11 +1,17 @@
 /**
- * Routes youtube.com requests through the dev/preview Vite proxy (`/__yt__`) so
- * YouTube timedtext / InnerTube calls work in the browser (direct cross-origin calls often fail with "Failed to fetch").
+ * Routes youtube.com requests through a same-origin proxy so InnerTube / timedtext
+ * work in the browser (direct cross-origin calls fail; browsers also cannot set the Android UA).
+ *
+ * - Dev / Vite preview: `/__yt__…` (vite.config.ts proxy)
+ * - Production (SWA): `/api/yt/…` (Azure Function YoutubeProxy)
  */
 const YT_ORIGIN = 'https://www.youtube.com'
 
 function proxyPrefix(): string {
   const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '')
+  if (import.meta.env.PROD) {
+    return `${base}/api/yt`
+  }
   return `${base}/__yt__`
 }
 

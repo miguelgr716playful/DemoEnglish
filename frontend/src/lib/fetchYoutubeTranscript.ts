@@ -166,7 +166,11 @@ export async function fetchYoutubeCaptionLines(
   })
 
   if (!innerRes.ok) {
-    throw new Error(`YouTube player request failed (${innerRes.status}).`)
+    const hint =
+      innerRes.status === 405
+        ? ' Caption proxy is missing or blocked (local: Vite /__yt__; production: /api/yt).'
+        : ''
+    throw new Error(`YouTube player request failed (${innerRes.status}).${hint}`)
   }
 
   const data: unknown = await innerRes.json()
