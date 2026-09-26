@@ -7,7 +7,39 @@ namespace DemoEnglish.Functions;
 /// <summary>Minimal multipart reader for field name "file" (Azure Functions HttpRequestData).</summary>
 internal static class MultipartFormReader
 {
-    internal sealed record UploadedFile(string FileName, MemoryStream File);
+    /// <summary>
+    /// Uploaded payload. Prefer a temp-file-backed stream for large parts so the .apkg
+    /// is not held entirely in a second <see cref="MemoryStream"/>.
+    /// </summary>
+    internal sealed class UploadedFile : IAsyncDisposable
+    {
+        private readonly string? _tempPath;
+
+        public UploadedFile(string fileName, Stream file, string? tempPath = null)
+        {
+            FileName = fileName;
+            File = file;
+            _tempPath = tempPath;
+        }
+
+        public string FileName { get; }
+        public Stream File { get; }
+
+        public async ValueTask DisposeAsync()
+        {
+            await File.DisposeAsync().ConfigureAwait(false);
+            if (_tempPath is null) return;
+            try
+            {
+                if (System.IO.File.Exists(_tempPath))
+                    System.IO.File.Delete(_tempPath);
+            }
+            catch
+            {
+                /* best-effort cleanup */
+            }
+        }
+    }
 
     public static async Task<UploadedFile> ReadAsync(
         HttpRequestData request,
@@ -76,8 +108,38 @@ internal static class MultipartFormReader
                 contentLen -= 2;
             }
 
-            var ms = new MemoryStream();
-            ms.Write(part, contentStart, Math.Max(0, contentLen));
+            contentLen = Math.Max(0, contentLen);
+
+            // Spill the file part to disk; small text uploads stay in memory.
+            var ext = Path.GetExtension(fileName).ToLowerInvariant();
+            if (ext == ".apkg" || contentLen > 1_048_576)
+            {
+                var tempPath = Path.Combine(
+                    Path.GetTempPath(),
+                    "demoenglish-upload-" + Guid.NewGuid().ToString("n") + (ext.Length > 0 ? ext : ".bin"));
+                using (var write = new FileStream(
+                           tempPath,
+                           FileMode.CreateNew,
+                           FileAccess.Write,
+                           FileShare.None,
+                           1024 * 80,
+                           FileOptions.SequentialScan))
+                {
+                    write.Write(part, contentStart, contentLen);
+                }
+
+                var read = new FileStream(
+                    tempPath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read,
+                    1024 * 80,
+                    FileOptions.Asynchronous | FileOptions.SequentialScan);
+                return new UploadedFile(fileName, read, tempPath);
+            }
+
+            var ms = new MemoryStream(contentLen);
+            ms.Write(part, contentStart, contentLen);
             ms.Position = 0;
             return new UploadedFile(fileName, ms);
         }

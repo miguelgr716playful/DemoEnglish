@@ -49,46 +49,48 @@ public sealed class AnkiFunctions
                 ex.Message).ConfigureAwait(false);
         }
 
-        if (form.File.Length == 0)
+        await using (form)
         {
-            return await HttpJson.ProblemAsync(
-                request,
-                HttpStatusCode.BadRequest,
-                "No file",
-                "Upload a non-empty .txt, .tsv, .csv, or .apkg file.").ConfigureAwait(false);
-        }
+            if (form.File.Length == 0)
+            {
+                return await HttpJson.ProblemAsync(
+                    request,
+                    HttpStatusCode.BadRequest,
+                    "No file",
+                    "Upload a non-empty .txt, .tsv, .csv, or .apkg file.").ConfigureAwait(false);
+            }
 
-        if (form.File.Length > FunctionUploadLimits.MaxMultipartBytes)
-        {
-            return await HttpJson.ProblemAsync(
-                request,
-                HttpStatusCode.RequestEntityTooLarge,
-                "File too large",
-                $"SWA Functions allow up to {FunctionUploadLimits.MaxMultipartBytes / (1024 * 1024)} MiB. Use the full API for larger .apkg files.")
-                .ConfigureAwait(false);
-        }
+            if (form.File.Length > FunctionUploadLimits.MaxMultipartBytes)
+            {
+                return await HttpJson.ProblemAsync(
+                    request,
+                    HttpStatusCode.RequestEntityTooLarge,
+                    "File too large",
+                    $"SWA Functions allow up to {FunctionUploadLimits.MaxMultipartBytes / (1024 * 1024)} MiB. Use the full API for larger .apkg files.")
+                    .ConfigureAwait(false);
+            }
 
-        var ext = Path.GetExtension(form.FileName).ToLowerInvariant();
-        if (ext == ".apkg")
-        {
-            await using var upload = form.File;
-            var result = await _apkgReader.ReadAsync(upload, cancellationToken).ConfigureAwait(false);
-            return await HttpJson.JsonAsync(request, HttpStatusCode.OK, result).ConfigureAwait(false);
-        }
+            var ext = Path.GetExtension(form.FileName).ToLowerInvariant();
+            if (ext == ".apkg")
+            {
+                var result = await _apkgReader.ReadAsync(form.File, cancellationToken).ConfigureAwait(false);
+                return await HttpJson.JsonAsync(request, HttpStatusCode.OK, result).ConfigureAwait(false);
+            }
 
-        if (ext is not (".txt" or ".tsv" or ".csv"))
-        {
-            return await HttpJson.ProblemAsync(
-                request,
-                HttpStatusCode.BadRequest,
-                "Unsupported extension",
-                "Use .txt, .tsv, .csv, or .apkg.").ConfigureAwait(false);
-        }
+            if (ext is not (".txt" or ".tsv" or ".csv"))
+            {
+                return await HttpJson.ProblemAsync(
+                    request,
+                    HttpStatusCode.BadRequest,
+                    "Unsupported extension",
+                    "Use .txt, .tsv, .csv, or .apkg.").ConfigureAwait(false);
+            }
 
-        using var reader = new StreamReader(form.File, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        var text = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-        var plainResult = _plainTextParser.Parse(text, form.FileName, cancellationToken);
-        return await HttpJson.JsonAsync(request, HttpStatusCode.OK, plainResult).ConfigureAwait(false);
+            using var reader = new StreamReader(form.File, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+            var text = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            var plainResult = _plainTextParser.Parse(text, form.FileName, cancellationToken);
+            return await HttpJson.JsonAsync(request, HttpStatusCode.OK, plainResult).ConfigureAwait(false);
+        }
     }
 
     [Function("AnkiExport")]

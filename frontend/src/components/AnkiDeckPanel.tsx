@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, Download, FileUp, Layers, MessageSquare, Search, Trash2 } from 'lucide-react'
 import { exportAnkiPlainText, importAnkiPlainText, sampleAnkiDownloadUrl } from '../api/ankiClient'
+import { extractMediaEmbedsInOrder } from '../lib/ankiCardLayout'
 import { importInterviewCsvFromFile } from '../lib/interviewCsvImport'
-import { extractApkgMediaUrls, revokeMediaUrls } from '../lib/apkgMedia'
+import { ApkgMediaStore } from '../lib/apkgMedia'
 import type { AnkiCard } from '../types/anki'
 import { AnkiCardDetailModal, baseWordLabel } from './AnkiCardDetailModal'
 
@@ -11,18 +12,20 @@ type AnkiDeckPanelProps = {
   onCardsChange: (cards: AnkiCard[]) => void
 }
 
+function mediaFilenamesForCard(card: AnkiCard): string[] {
+  return extractMediaEmbedsInOrder(`${card.front}\n${card.back}`).map((e) => e.filename)
+}
+
 export function AnkiDeckPanel({ cards, onCardsChange }: AnkiDeckPanelProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const interviewCsvInputRef = useRef<HTMLInputElement | null>(null)
-  const mediaUrlsRef = useRef<Map<string, string>>(new Map())
+  const mediaStoreRef = useRef<ApkgMediaStore | null>(null)
   const [importMode, setImportMode] = useState<'append' | 'replace'>('append')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [mediaUrls, setMediaUrls] = useState<Map<string, string>>(() => new Map())
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [listSearch, setListSearch] = useState('')
-
-  mediaUrlsRef.current = mediaUrls
 
   const { deckOrdinalByIndex, sortedDeckIndices } = useMemo(() => {
     const order = cards
@@ -82,8 +85,8 @@ export function AnkiDeckPanel({ cards, onCardsChange }: AnkiDeckPanelProps) {
 
   useEffect(
     () => () => {
-      revokeMediaUrls(mediaUrlsRef.current)
-      mediaUrlsRef.current = new Map()
+      mediaStoreRef.current?.dispose()
+      mediaStoreRef.current = null
     },
     [],
   )
@@ -107,6 +110,38 @@ export function AnkiDeckPanel({ cards, onCardsChange }: AnkiDeckPanelProps) {
     if (!match) setSelectedIndex(null)
   }, [listSearch, selectedIndex, cards])
 
+  // Decode [sound:] / [img:] from the open card only (and lightly prefetch next/prev in A–Z order).
+  useEffect(() => {
+    if (selectedIndex === null) return
+    const card = cards[selectedIndex]
+    const store = mediaStoreRef.current
+    if (!card || !store) return
+
+    let cancelled = false
+    const names = mediaFilenamesForCard(card)
+    const neighborNames: string[] = []
+    const pos = sortedDeckIndices.indexOf(selectedIndex)
+    if (pos >= 0) {
+      const nextIdx = sortedDeckIndices[pos + 1]
+      const prevIdx = sortedDeckIndices[pos - 1]
+      if (nextIdx != null && cards[nextIdx]) neighborNames.push(...mediaFilenamesForCard(cards[nextIdx]))
+      if (prevIdx != null && cards[prevIdx]) neighborNames.push(...mediaFilenamesForCard(cards[prevIdx]))
+    }
+
+    void (async () => {
+      try {
+        const urls = await store.ensureMany([...names, ...neighborNames])
+        if (!cancelled) setMediaUrls(urls)
+      } catch {
+        /* keep previous decoded URLs if a single card decode fails */
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [selectedIndex, cards, sortedDeckIndices])
+
   const applyImportFromFile = useCallback(
     async (file: File, mode: 'append' | 'replace'): Promise<string> => {
       const result = await importAnkiPlainText(file)
@@ -118,23 +153,14 @@ export function AnkiDeckPanel({ cards, onCardsChange }: AnkiDeckPanelProps) {
       onCardsChange(mode === 'replace' ? mapped : [...cards, ...mapped])
 
       const isApkg = file.name.toLowerCase().endsWith('.apkg')
-      if (mode === 'replace') {
-        setMediaUrls((prev) => {
-          revokeMediaUrls(prev)
-          return new Map()
-        })
+      if (mode === 'replace' || isApkg) {
+        mediaStoreRef.current?.dispose()
+        mediaStoreRef.current = null
+        setMediaUrls(new Map())
       }
       if (isApkg) {
-        const extracted = await extractApkgMediaUrls(file)
-        setMediaUrls((prev) => {
-          const next = mode === 'replace' ? new Map<string, string>() : new Map(prev)
-          for (const [name, url] of extracted) {
-            const old = next.get(name)
-            if (old) URL.revokeObjectURL(old)
-            next.set(name, url)
-          }
-          return next
-        })
+        // Index the ZIP + media map only; blob URLs are created when a card is opened.
+        mediaStoreRef.current = await ApkgMediaStore.open(file)
       }
 
       return result.warnings.length
@@ -265,10 +291,9 @@ export function AnkiDeckPanel({ cards, onCardsChange }: AnkiDeckPanelProps) {
     setSelectedIndex(null)
     setListSearch('')
     setMessage(null)
-    setMediaUrls((prev) => {
-      revokeMediaUrls(prev)
-      return new Map()
-    })
+    mediaStoreRef.current?.dispose()
+    mediaStoreRef.current = null
+    setMediaUrls(new Map())
   }
 
   return (

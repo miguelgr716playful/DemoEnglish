@@ -79,10 +79,12 @@ Dictado y grabación **no** se usan a la vez (conflicto de micrófono con Web Sp
 
 ### Anki `.apkg`
 
-El backend descomprime el ZIP, abre `collection.anki2` / `collection.anki21` (SQLite) y lee `notes.flds` (U+001F). Primer campo = frente; resto = reverso. HTML se reduce a texto básico.
+El backend **copia el stream a un archivo temporal**, abre el ZIP desde disco, extrae solo `collection.anki2` / `collection.anki21` (SQLite) y lee `notes.flds` (U+001F). Primer campo = frente; resto = reverso. HTML se reduce a texto básico. Así el paquete grande no vive entero en un `MemoryStream`.
+
+En el navegador, `ApkgMediaStore` indexa el ZIP al importar pero **solo materializa blob URLs** de `[sound:]` / `[img:]` al abrir una tarjeta (con prefetch ligero de la anterior/siguiente en orden A–Z).
 
 - API Kestrel: hasta **10 GiB** por subida, **10.000** notas por petición.
-- Functions / SWA: hasta **~100 MiB** por subida.
+- Functions / SWA: hasta **~100 MiB** por subida (el multipart de Functions sigue en memoria; para mazos muy grandes conviene local/Kestrel o un flujo Blob + job async, no implementado aún).
 
 ## API (endpoints)
 

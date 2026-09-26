@@ -125,8 +125,15 @@ public sealed class YouTubeCaptionsService
                 .ConfigureAwait(false);
             var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
-                throw new InvalidOperationException(TryGoogleError(body) ?? $"Token refresh HTTP {(int)response.StatusCode}");
-
+            {
+                var google = TryGoogleError(body);
+                var hint =
+                    " Check that ClientId, ClientSecret, and RefreshToken belong together " +
+                    "(OAuth Playground → gear → Use your own OAuth credentials with THIS client). " +
+                    "Scope should include https://www.googleapis.com/auth/youtube.force-ssl";
+                throw new InvalidOperationException(
+                    (google ?? $"Token refresh HTTP {(int)response.StatusCode}") + hint);
+            }
             using var doc = JsonDocument.Parse(body);
             var token = doc.RootElement.GetProperty("access_token").GetString()
                         ?? throw new InvalidOperationException("OAuth response missing access_token.");
@@ -283,12 +290,25 @@ public sealed class YouTubeCaptionsService
         try
         {
             using var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.TryGetProperty("error", out var err))
+            var root = doc.RootElement;
+
+            // OAuth token endpoint: { "error": "invalid_grant", "error_description": "..." }
+            if (root.TryGetProperty("error_description", out var desc))
             {
-                if (err.TryGetProperty("message", out var msg))
-                    return msg.GetString();
+                var d = desc.GetString();
+                if (!string.IsNullOrWhiteSpace(d))
+                {
+                    var code = root.TryGetProperty("error", out var errCode) ? errCode.GetString() : null;
+                    return string.IsNullOrWhiteSpace(code) ? d : $"{code}: {d}";
+                }
+            }
+
+            if (root.TryGetProperty("error", out var err))
+            {
                 if (err.ValueKind == JsonValueKind.String)
                     return err.GetString();
+                if (err.TryGetProperty("message", out var msg))
+                    return msg.GetString();
             }
         }
         catch

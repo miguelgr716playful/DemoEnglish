@@ -11,6 +11,7 @@ public sealed class AnkiApkgImportReader : IAnkiApkgImportReader
 {
     private const int MaxNotesImported = 10_000;
     private const char FieldSeparator = '\u001f'; // Anki unit separator between fields
+    private const int CopyBufferSize = 1024 * 128;
 
     private static readonly Regex HtmlTag = new("<[^>]+>", RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -33,20 +34,52 @@ public sealed class AnkiApkgImportReader : IAnkiApkgImportReader
             ".apkg: using the first field as front and remaining fields as back (HTML stripped). Cloze and custom layouts are simplified.",
         };
 
-        await using var buffered = new MemoryStream();
-        await apkgStream.CopyToAsync(buffered, cancellationToken).ConfigureAwait(false);
-        if (buffered.Length == 0)
-            return new AnkiImportResultDto([], ["The package is empty."]);
+        // Stream to disk instead of buffering the whole package in RAM (large decks).
+        // If the caller already spilled the upload to a temp FileStream, reuse that path.
+        string tempApkgPath;
+        var ownsTempApkg = true;
+        if (apkgStream is FileStream existingFile &&
+            !string.IsNullOrEmpty(existingFile.Name) &&
+            File.Exists(existingFile.Name))
+        {
+            tempApkgPath = existingFile.Name;
+            ownsTempApkg = false;
+            if (existingFile.CanSeek)
+                existingFile.Position = 0;
+        }
+        else
+        {
+            tempApkgPath = Path.Combine(Path.GetTempPath(), "demoenglish-apkg-" + Guid.NewGuid().ToString("n") + ".apkg");
+            await using (var file = new FileStream(
+                             tempApkgPath,
+                             FileMode.CreateNew,
+                             FileAccess.Write,
+                             FileShare.None,
+                             CopyBufferSize,
+                             FileOptions.Asynchronous | FileOptions.SequentialScan))
+            {
+                await apkgStream.CopyToAsync(file, CopyBufferSize, cancellationToken).ConfigureAwait(false);
+            }
+        }
 
-        buffered.Position = 0;
-
-        var tempDir = Path.Combine(Path.GetTempPath(), "demoenglish-apkg-" + Guid.NewGuid().ToString("n"));
+        var tempDir = Path.Combine(Path.GetTempPath(), "demoenglish-apkg-extract-" + Guid.NewGuid().ToString("n"));
         Directory.CreateDirectory(tempDir);
         string? collectionPath = null;
 
         try
         {
-            using (var zip = new ZipArchive(buffered, ZipArchiveMode.Read, leaveOpen: true))
+            var apkgInfo = new FileInfo(tempApkgPath);
+            if (!apkgInfo.Exists || apkgInfo.Length == 0)
+                return new AnkiImportResultDto([], ["The package is empty."]);
+
+            await using (var file = new FileStream(
+                             tempApkgPath,
+                             FileMode.Open,
+                             FileAccess.Read,
+                             FileShare.Read,
+                             CopyBufferSize,
+                             FileOptions.Asynchronous | FileOptions.SequentialScan))
+            using (var zip = new ZipArchive(file, ZipArchiveMode.Read, leaveOpen: false))
             {
                 foreach (var entry in zip.Entries)
                 {
@@ -95,15 +128,35 @@ public sealed class AnkiApkgImportReader : IAnkiApkgImportReader
         }
         finally
         {
-            try
-            {
-                if (Directory.Exists(tempDir))
-                    Directory.Delete(tempDir, recursive: true);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDebug(ex, "Could not delete temp apkg dir {Dir}", tempDir);
-            }
+            if (ownsTempApkg)
+                TryDeleteFile(tempApkgPath);
+            TryDeleteDirectory(tempDir);
+        }
+    }
+
+    private void TryDeleteFile(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Could not delete temp apkg file {Path}", path);
+        }
+    }
+
+    private void TryDeleteDirectory(string path)
+    {
+        try
+        {
+            if (Directory.Exists(path))
+                Directory.Delete(path, recursive: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Could not delete temp apkg dir {Dir}", path);
         }
     }
 
