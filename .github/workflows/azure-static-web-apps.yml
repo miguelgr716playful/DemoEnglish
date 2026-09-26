@@ -56,7 +56,7 @@ jobs:
           api_location: api
           output_location: ''
           skip_app_build: true
-          api_build_command: dotnet publish DemoEnglish.Functions.csproj -c Release
+          api_build_command: dotnet publish DemoEnglish.Functions.csproj -c Release -f net8.0
 
   close_pull_request:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

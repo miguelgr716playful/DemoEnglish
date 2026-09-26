@@ -107,7 +107,7 @@ dotnet user-secrets set "OpenAI:ChatModel" "gpt-4o-mini"
 
 ## Azure Functions (SWA)
 
-Carpeta [`api/`](api/): worker **.NET 8 isolated** (compatible con SWA managed) con las mismas rutas, reutilizando Application + Infrastructure (`net8.0` / `net10.0`).
+Carpeta [`api/`](api/): worker **.NET 8 isolated** (compatible con SWA managed) con las mismas rutas. Application / Infrastructure / Domain también en **net8.0**; el host Kestrel (`DemoEnglish.Api`) sigue en **net10.0** y las referencia sin problema.
 
 ```bash
 cd api
