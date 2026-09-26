@@ -95,6 +95,7 @@ Misma forma en Kestrel y en Functions:
 | `POST` | `/api/anki/export` | JSON `{ "cards": [{ "front", "back" }] }` → `.txt` Anki |
 | `GET` | `/api/anki/sample` | Ejemplo de mazo |
 | `POST` | `/api/interview/summary` | JSON `{ "transcript" }` → `{ "summary" }` |
+| `GET` | `/api/youtube/captions/{videoId}?lang=en` | Captions oficiales (OAuth; vídeos propios) |
 
 Config OpenAI (Kestrel: `appsettings` / user-secrets; Functions: env):
 
@@ -132,6 +133,32 @@ En producción SWA el frontend usa **mismo origen** (`VITE_API_BASE_URL` vacío 
 | `OpenAI__ApiKey` | Resumen de entrevista |
 | `OpenAI__ChatModel` | Modelo (default `gpt-4o-mini`) |
 | `DictionaryApi__BaseUrl` | Override diccionario (default `https://freedictionaryapi.com/`) |
+| `YouTube__ClientId` | OAuth client id (captions oficiales) |
+| `YouTube__ClientSecret` | OAuth client secret |
+| `YouTube__RefreshToken` | Refresh token de una cuenta que **posea** los vídeos |
+| `YouTube__ApiKey` | Opcional (no basta sola para `captions.download`) |
+
+### YouTube captions (Data API v3)
+
+`GET /api/youtube/captions/{videoId}?lang=en` usa **captions.list** + **captions.download** con OAuth.
+
+**Límite de Google:** solo puedes descargar captions de vídeos **tuyos** (cuenta del refresh token). Lecciones de BBC u otros canales → usa **Open on YouTube** (el embed sí muestra CC del player).
+
+Configuración rápida:
+
+1. Google Cloud → habilita **YouTube Data API v3**.
+2. Crea credenciales OAuth (tipo Desktop) → `ClientId` + `ClientSecret`.
+3. Obtén un **refresh token** con scope `https://www.googleapis.com/auth/youtube.force-ssl` (p. ej. [OAuth 2.0 Playground](https://developers.google.com/oauthplayground): engranaje → “Use your own OAuth credentials” → autoriza YouTube Data API v3 → Exchange authorization code).
+4. Local (API):
+
+```bash
+cd src/DemoEnglish.Api
+dotnet user-secrets set "YouTube:ClientId" "...."
+dotnet user-secrets set "YouTube:ClientSecret" "...."
+dotnet user-secrets set "YouTube:RefreshToken" "...."
+```
+
+5. SWA: Application settings `YouTube__ClientId`, `YouTube__ClientSecret`, `YouTube__RefreshToken`.
 
 4. Push a `main`/`master` o ejecuta el workflow [`.github/workflows/azure-static-web-apps.yml`](.github/workflows/azure-static-web-apps.yml) (*Actions → Azure Static Web Apps → Run workflow*). El job publica `frontend/dist` y la API precompilada (`swa-api/`).
 

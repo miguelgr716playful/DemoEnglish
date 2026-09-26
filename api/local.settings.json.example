@@ -6,7 +6,11 @@
     "DictionaryApi__BaseUrl": "https://freedictionaryapi.com/",
     "DictionaryApi__TimeoutSeconds": "20",
     "OpenAI__ApiKey": "",
-    "OpenAI__ChatModel": "gpt-4o-mini"
+    "OpenAI__ChatModel": "gpt-4o-mini",
+    "YouTube__ApiKey": "",
+    "YouTube__ClientId": "",
+    "YouTube__ClientSecret": "",
+    "YouTube__RefreshToken": ""
   },
   "Host": {
     "LocalHttpPort": 7071,

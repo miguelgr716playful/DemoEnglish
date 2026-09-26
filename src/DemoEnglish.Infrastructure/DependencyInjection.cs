@@ -1,9 +1,11 @@
 using DemoEnglish.Application.Anki;
 using DemoEnglish.Application.Dictionary;
 using DemoEnglish.Application.Interview;
+using DemoEnglish.Application.YouTube;
 using DemoEnglish.Infrastructure.Anki;
 using DemoEnglish.Infrastructure.Dictionary;
 using DemoEnglish.Infrastructure.Interview;
+using DemoEnglish.Infrastructure.YouTube;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,9 +17,11 @@ public static class DependencyInjection
     {
         services.Configure<DictionaryApiOptions>(configuration.GetSection(DictionaryApiOptions.SectionName));
         services.Configure<OpenAiOptions>(configuration.GetSection(OpenAiOptions.SectionName));
+        services.Configure<YouTubeOptions>(configuration.GetSection(YouTubeOptions.SectionName));
         services.AddSingleton<IAnkiPlainTextImportParser, AnkiPlainTextImportParser>();
         services.AddScoped<IAnkiApkgImportReader, AnkiApkgImportReader>();
         services.AddScoped<OpenAiInterviewCoach>();
+        services.AddSingleton<YouTubeCaptionsService>();
 
         services.AddHttpClient(DictionaryLookupService.HttpClientName, (sp, client) =>
         {
@@ -37,6 +41,13 @@ public static class DependencyInjection
             client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(90);
+            });
+
+        services.AddHttpClient(
+            YouTubeCaptionsService.HttpClientName,
+            client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(60);
             });
 
         services.AddScoped<IDictionaryLookupService, DictionaryLookupService>();

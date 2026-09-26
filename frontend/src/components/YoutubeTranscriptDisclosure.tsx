@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Captions, ChevronDown, Loader2 } from 'lucide-react'
 import {
-  fetchYoutubeCaptionLines,
-  type YoutubeCaptionLine,
-} from '../lib/fetchYoutubeTranscript'
-import { youtubeProxyFetch } from '../lib/youtubeProxyFetch'
+  fetchYoutubeCaptionsFromApi,
+  YoutubeCaptionsError,
+  type YoutubeCaptionLineDto,
+} from '../api/youtubeCaptionsClient'
 
-/** srv3 uses ms; classic timedtext uses seconds — infer from duration scale. */
-function offsetDisplayMs(line: YoutubeCaptionLine): number {
+function offsetDisplayMs(line: YoutubeCaptionLineDto): number {
+  // Official API returns SRT seconds; legacy InnerTube srv3 used ms.
   return line.duration > 150 ? line.offset : line.offset * 1000
 }
 
@@ -21,15 +21,13 @@ function formatTimestampMs(ms: number) {
 type LoadState =
   | { status: 'idle' }
   | { status: 'loading' }
-  | { status: 'ok'; lines: YoutubeCaptionLine[] }
+  | { status: 'ok'; lines: YoutubeCaptionLineDto[] }
   | { status: 'error'; message: string }
 
 type YoutubeTranscriptDisclosureProps = {
   videoId: string
-  /** ISO language code for caption track (default English). */
   lang?: string
   className?: string
-  /** Label on the toggle control. */
   summaryLabel?: string
 }
 
@@ -41,7 +39,7 @@ export function YoutubeTranscriptDisclosure({
 }: YoutubeTranscriptDisclosureProps) {
   const [expanded, setExpanded] = useState(false)
   const [state, setState] = useState<LoadState>({ status: 'idle' })
-  const cacheRef = useRef<{ videoId: string; lines: YoutubeCaptionLine[] } | null>(null)
+  const cacheRef = useRef<{ videoId: string; lines: YoutubeCaptionLineDto[] } | null>(null)
 
   useEffect(() => {
     cacheRef.current = null
@@ -52,15 +50,24 @@ export function YoutubeTranscriptDisclosure({
   const load = useCallback(async () => {
     setState({ status: 'loading' })
     try {
-      const lines = await fetchYoutubeCaptionLines(videoId, {
-        lang,
-        fetch: youtubeProxyFetch,
-      })
+      const lines = await fetchYoutubeCaptionsFromApi(videoId, lang)
+      if (lines.length === 0) {
+        setState({
+          status: 'error',
+          message:
+            'No caption lines returned. Official API only works for videos owned by your YouTube OAuth account.',
+        })
+        return
+      }
       cacheRef.current = { videoId, lines }
       setState({ status: 'ok', lines })
     } catch (e) {
       const msg =
-        e instanceof Error && e.message ? e.message : 'Could not load captions.'
+        e instanceof YoutubeCaptionsError
+          ? e.message
+          : e instanceof Error && e.message
+            ? e.message
+            : 'Could not load captions.'
       setState({ status: 'error', message: msg })
     }
   }, [videoId, lang])
@@ -108,12 +115,16 @@ export function YoutubeTranscriptDisclosure({
           {state.status === 'loading' ? (
             <p className="flex min-h-[4.5rem] items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
               <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden />
-              Loading captions…
+              Loading captions (YouTube Data API)…
             </p>
           ) : null}
           {state.status === 'error' ? (
             <div className="min-h-[4.5rem] space-y-2">
               <p className="text-sm text-red-700 dark:text-red-400">{state.message}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Tip: use <strong className="font-medium">Open on YouTube</strong> for third-party videos (BBC, etc.).
+                Official captions require OAuth for a channel that owns the video.
+              </p>
               <button
                 type="button"
                 onClick={(e) => {
