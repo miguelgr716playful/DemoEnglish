@@ -86,6 +86,23 @@ En el navegador, `ApkgMediaStore` indexa el ZIP al importar pero **solo material
 - API Kestrel: hasta **10 GiB** por subida, **10.000** notas por petición.
 - Functions / SWA: hasta **~100 MiB** por subida (el multipart de Functions sigue en memoria; para mazos muy grandes conviene local/Kestrel o un flujo Blob + job async, no implementado aún).
 
+### Anki → Azure Table Storage (ETL consola)
+
+Herramienta [`tools/AnkiSqlEtl`](tools/AnkiSqlEtl): lee un `.apkg` y escribe en **Azure Table Storage** (crea las tablas si no existen).
+
+| Tabla | Clave | Contenido |
+|-------|--------|-----------|
+| `AnkiNotes` | PK = deck, RK = ordinal (`00000001`…) | Front, Back, FrontPlain, MediaJson, ImportId |
+| `AnkiImports` | PK = deck, RK = importId | archivo, SHA256, conteos, warnings |
+
+```bash
+dotnet run --project tools/AnkiSqlEtl -- --apkg "C:\decks\my.apkg" --connection "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net" --deck "Oxford" --replace
+```
+
+Env: `DEMOENGLISH_STORAGE_CONNECTION`. La UI React **no** lee aún estas tablas.
+
+Opcional (SQL en vez de Tables): [`sql/anki-azure-sql.sql`](sql/anki-azure-sql.sql) — el ETL actual **no** lo usa.
+
 ## API (endpoints)
 
 Misma forma en Kestrel y en Functions:
