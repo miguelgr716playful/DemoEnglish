@@ -1,0 +1,5 @@
+# Local Azure Functions settings (secrets). Keep out of source control.
+local.settings.json
+bin/
+obj/
+.vscode/

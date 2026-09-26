@@ -1,7 +1,9 @@
 using DemoEnglish.Application.Anki;
 using DemoEnglish.Application.Dictionary;
+using DemoEnglish.Application.Interview;
 using DemoEnglish.Infrastructure.Anki;
 using DemoEnglish.Infrastructure.Dictionary;
+using DemoEnglish.Infrastructure.Interview;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,8 +14,10 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<DictionaryApiOptions>(configuration.GetSection(DictionaryApiOptions.SectionName));
+        services.Configure<OpenAiOptions>(configuration.GetSection(OpenAiOptions.SectionName));
         services.AddSingleton<IAnkiPlainTextImportParser, AnkiPlainTextImportParser>();
         services.AddScoped<IAnkiApkgImportReader, AnkiApkgImportReader>();
+        services.AddScoped<OpenAiInterviewCoach>();
 
         services.AddHttpClient(DictionaryLookupService.HttpClientName, (sp, client) =>
         {
@@ -27,6 +31,13 @@ public static class DependencyInjection
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(Math.Clamp(opts.TimeoutSeconds, 5, 60));
         });
+
+        services.AddHttpClient(
+            OpenAiInterviewCoach.HttpClientName,
+            client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(90);
+            });
 
         services.AddScoped<IDictionaryLookupService, DictionaryLookupService>();
 

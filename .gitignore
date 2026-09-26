@@ -4,6 +4,7 @@
 *.user
 *.suo
 .vs/
+artifacts/
 
 # Node / frontend
 frontend/node_modules/

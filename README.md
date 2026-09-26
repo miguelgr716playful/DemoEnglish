@@ -116,6 +116,31 @@ npm run build
 
 Los artefactos quedan en `frontend/dist/`.
 
+## Integración continua (GitHub Actions)
+
+En cada push y pull request a `main` / `master`, el workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) ejecuta:
+
+1. **API:** `dotnet restore` / `build` / `test` sobre `DemoEnglish.slnx` (.NET 10).
+2. **Functions (SWA):** compila `api/DemoEnglish.Functions.csproj`.
+3. **Frontend:** `npm ci` y `npm run build` en `frontend/` (incluye `tsc -b`).
+
+No despliega a Azure por defecto. Para publicar en **Azure Static Web Apps** (SPA + Functions gestionadas), usa [`.github/workflows/azure-static-web-apps.yml`](.github/workflows/azure-static-web-apps.yml) y el secret `AZURE_STATIC_WEB_APPS_API_TOKEN`.
+
+### API como Azure Functions (SWA)
+
+Carpeta [`api/`](api/): worker **.NET isolated** con las mismas rutas que el host Kestrel (`/api/dictionary/...`, `/api/anki/...`, `/api/interview/summary`), reutilizando Application + Infrastructure.
+
+```bash
+# Requiere Azure Functions Core Tools (func)
+cd api
+copy local.settings.json.example local.settings.json
+# opcional: rellena OpenAI__ApiKey
+func start
+```
+
+Límite de subida en Functions: **100 MiB** (SWA no admite el techo de 10 GiB del API Kestrel). En Application settings de SWA: `OpenAI__ApiKey`, `OpenAI__ChatModel`.
+
+En producción SWA, el frontend usa **mismo origen** (`VITE_API_BASE_URL` vacío → `/api/...`). Localmente sigue apuntando al API Kestrel vía `.env.development`.
 ## Estructura del backend (Clean Architecture)
 
 | Proyecto | Rol |

@@ -63,6 +63,10 @@ export function getApiBase(): string {
   }
 
   if (!baseUrl) {
+    // Production on Azure Static Web Apps: call managed Functions on the same origin (/api/…).
+    if (import.meta.env.PROD) {
+      return ''
+    }
     console.warn('VITE_API_BASE_URL is not set; defaulting to https://localhost:7282')
     return 'https://localhost:7282'
   }

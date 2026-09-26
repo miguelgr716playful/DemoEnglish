@@ -1,13 +1,15 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+using DemoEnglish.Application.Interview;
 using Microsoft.Extensions.Options;
 
-namespace DemoEnglish.Api.Services;
+namespace DemoEnglish.Infrastructure.Interview;
 
 public sealed class OpenAiInterviewCoach
 {
+    public const string HttpClientName = "OpenAI";
+
     private const int MinTranscriptChars = 25;
     private const int MaxTranscriptChars = 16_000;
 
@@ -20,50 +22,38 @@ public sealed class OpenAiInterviewCoach
         _options = options;
     }
 
-    public async Task<(bool Ok, string? Summary, ProblemDetails? Problem)> SummarizeAsync(
-        string transcript,
-        CancellationToken cancellationToken)
+    public async Task<InterviewSummaryOutcome> SummarizeAsync(string transcript, CancellationToken cancellationToken)
     {
         var trimmed = transcript.Trim();
         if (trimmed.Length < MinTranscriptChars)
         {
-            return (
+            return new InterviewSummaryOutcome(
                 false,
                 null,
-                new ProblemDetails
-                {
-                    Title = "Transcript too short",
-                    Detail = $"Provide at least {MinTranscriptChars} characters of interview text.",
-                    Status = StatusCodes.Status400BadRequest,
-                });
+                400,
+                "Transcript too short",
+                $"Provide at least {MinTranscriptChars} characters of interview text.");
         }
 
         if (trimmed.Length > MaxTranscriptChars)
         {
-            return (
+            return new InterviewSummaryOutcome(
                 false,
                 null,
-                new ProblemDetails
-                {
-                    Title = "Transcript too long",
-                    Detail = $"Maximum length is {MaxTranscriptChars} characters.",
-                    Status = StatusCodes.Status400BadRequest,
-                });
+                400,
+                "Transcript too long",
+                $"Maximum length is {MaxTranscriptChars} characters.");
         }
 
         var key = _options.CurrentValue.ApiKey?.Trim();
         if (string.IsNullOrEmpty(key))
         {
-            return (
+            return new InterviewSummaryOutcome(
                 false,
                 null,
-                new ProblemDetails
-                {
-                    Title = "Interview summary not configured",
-                    Detail =
-                        "Set configuration key OpenAI:ApiKey (e.g. dotnet user-secrets set \"OpenAI:ApiKey\" \"sk-…\" from the Api project folder).",
-                    Status = StatusCodes.Status503ServiceUnavailable,
-                });
+                503,
+                "Interview summary not configured",
+                "Set configuration key OpenAI:ApiKey (user secrets, env, or SWA Application settings).");
         }
 
         var model = string.IsNullOrWhiteSpace(_options.CurrentValue.ChatModel)
@@ -98,7 +88,7 @@ public sealed class OpenAiInterviewCoach
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
         request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var client = _httpClientFactory.CreateClient("OpenAI");
+        var client = _httpClientFactory.CreateClient(HttpClientName);
         HttpResponseMessage response;
         try
         {
@@ -106,42 +96,28 @@ public sealed class OpenAiInterviewCoach
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            return (
+            return new InterviewSummaryOutcome(
                 false,
                 null,
-                new ProblemDetails
-                {
-                    Title = "OpenAI request timed out",
-                    Detail = "The summary request took too long. Try a shorter transcript.",
-                    Status = StatusCodes.Status504GatewayTimeout,
-                });
+                504,
+                "OpenAI request timed out",
+                "The summary request took too long. Try a shorter transcript.");
         }
         catch (HttpRequestException ex)
         {
-            return (
+            return new InterviewSummaryOutcome(
                 false,
                 null,
-                new ProblemDetails
-                {
-                    Title = "Could not reach OpenAI",
-                    Detail = ex.Message,
-                    Status = StatusCodes.Status502BadGateway,
-                });
+                502,
+                "Could not reach OpenAI",
+                ex.Message);
         }
 
         var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
         {
             var detail = TryReadOpenAiError(body) ?? response.ReasonPhrase ?? "OpenAI returned an error.";
-            return (
-                false,
-                null,
-                new ProblemDetails
-                {
-                    Title = "OpenAI error",
-                    Detail = detail,
-                    Status = StatusCodes.Status502BadGateway,
-                });
+            return new InterviewSummaryOutcome(false, null, 502, "OpenAI error", detail);
         }
 
         string? summary;
@@ -152,32 +128,16 @@ public sealed class OpenAiInterviewCoach
         }
         catch (Exception ex)
         {
-            return (
-                false,
-                null,
-                new ProblemDetails
-                {
-                    Title = "Unexpected OpenAI response",
-                    Detail = ex.Message,
-                    Status = StatusCodes.Status502BadGateway,
-                });
+            return new InterviewSummaryOutcome(false, null, 502, "Unexpected OpenAI response", ex.Message);
         }
 
         summary = summary?.Trim();
         if (string.IsNullOrEmpty(summary))
         {
-            return (
-                false,
-                null,
-                new ProblemDetails
-                {
-                    Title = "Empty summary",
-                    Detail = "The model returned no text.",
-                    Status = StatusCodes.Status502BadGateway,
-                });
+            return new InterviewSummaryOutcome(false, null, 502, "Empty summary", "The model returned no text.");
         }
 
-        return (true, summary, null);
+        return new InterviewSummaryOutcome(true, summary);
     }
 
     private static string? TryReadOpenAiError(string json)

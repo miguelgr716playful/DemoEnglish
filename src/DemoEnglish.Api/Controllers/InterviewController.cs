@@ -1,4 +1,4 @@
-using DemoEnglish.Api.Services;
+using DemoEnglish.Infrastructure.Interview;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DemoEnglish.Api.Controllers;
@@ -44,12 +44,19 @@ public sealed class InterviewController : ControllerBase
                 });
         }
 
-        var (ok, summary, problem) = await _coach.SummarizeAsync(body.Transcript, cancellationToken).ConfigureAwait(false);
-        if (!ok)
+        var outcome = await _coach.SummarizeAsync(body.Transcript, cancellationToken).ConfigureAwait(false);
+        if (!outcome.Ok)
         {
-            return StatusCode(problem!.Status!.Value, problem);
+            return StatusCode(
+                outcome.Status ?? StatusCodes.Status500InternalServerError,
+                new ProblemDetails
+                {
+                    Title = outcome.Title,
+                    Detail = outcome.Detail,
+                    Status = outcome.Status,
+                });
         }
 
-        return Ok(new SummaryResponse { Summary = summary! });
+        return Ok(new SummaryResponse { Summary = outcome.Summary! });
     }
 }

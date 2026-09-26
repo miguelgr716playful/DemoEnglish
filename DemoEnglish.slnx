@@ -5,6 +5,9 @@
     <Project Path="src/DemoEnglish.Domain/DemoEnglish.Domain.csproj" />
     <Project Path="src/DemoEnglish.Infrastructure/DemoEnglish.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/api/">
+    <Project Path="api/DemoEnglish.Functions.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/DemoEnglish.Tests/DemoEnglish.Tests.csproj" />
   </Folder>

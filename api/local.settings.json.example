@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DictionaryApi__BaseUrl": "https://api.dictionaryapi.dev/",
+    "DictionaryApi__TimeoutSeconds": "15",
+    "OpenAI__ApiKey": "",
+    "OpenAI__ChatModel": "gpt-4o-mini"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*",
+    "CORSCredentials": false
+  }
+}
