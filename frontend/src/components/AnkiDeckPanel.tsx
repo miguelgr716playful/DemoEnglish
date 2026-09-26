@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronRight, Download, FileUp, Layers, MessageSquare, Search, Trash2 } from 'lucide-react'
+import { ChevronRight, Download, FileUp, MessageSquare, Search, Trash2 } from 'lucide-react'
 import { exportAnkiPlainText, importAnkiPlainText, sampleAnkiDownloadUrl } from '../api/ankiClient'
 import { extractMediaEmbedsInOrder } from '../lib/ankiCardLayout'
 import { importInterviewCsvFromFile } from '../lib/interviewCsvImport'
@@ -297,160 +297,167 @@ export function AnkiDeckPanel({ cards, onCardsChange }: AnkiDeckPanelProps) {
   }
 
   return (
-    <section className="w-full max-w-6xl space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100">
-        <Layers className="size-5 shrink-0 text-indigo-600 dark:text-indigo-400" aria-hidden />
-        <h2 className="text-lg font-semibold tracking-tight">Anki deck (plain text)</h2>
-      </div>
-      <p className="text-sm text-slate-600 dark:text-slate-400">
-        Import <strong>.apkg</strong> (reads <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">collection.anki2</code> /{' '}
-        <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">collection.anki21</code> inside the ZIP) or plain{' '}
-        <strong>.txt</strong> / <strong>.tsv</strong> / two-column <strong>.csv</strong> (server). For <strong>interview Q&amp;A</strong> CSV with
-        headers (Pregunta/Guía, Question/Answer, etc. — same rules as <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">tools/AnkiInterviewExporter</code>
-        ), use <strong>Import interview CSV</strong> so Part 1/2 follow question → answer. HTML in fields is stripped to text. Add dictionary cards with
-        the button on the result card.
-      </p>
+    <>
+      <header className="page-topbar">
+        <span className="eyebrow">ANKI DECK</span>
+        <span className="date-label">{cards.length} total cards</span>
+      </header>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-        {/*
-          iOS Safari: avoid `display:none` + programmatic input.click() — the picker may not open
-          or files look unselectable. Use a native <label> + visually hidden input (sr-only), and
-          avoid a tight `accept` filter so .apkg shows normally in Files.
-        */}
-        <label
-          className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 ${
-            busy ? 'pointer-events-none opacity-60' : ''
-          }`}
-        >
+      <section className="deck-title">
+        <div>
+          <h1>
+            Your working vocabulary<span className="accent-dot">.</span>
+          </h1>
+          <p>Keep the list light. Put your attention on one word at a time.</p>
+        </div>
+        {cards.length > 0 ? (
+          <button
+            type="button"
+            className="button button-primary"
+            onClick={() => setSelectedIndex(sortedDeckIndices[0] ?? 0)}
+          >
+            Study first card
+          </button>
+        ) : null}
+      </section>
+
+      <section className="deck-stats">
+        <div>
+          <span>{cards.length}</span>
+          <small>TOTAL</small>
+        </div>
+        <div>
+          <span>{listRows.length}</span>
+          <small>VISIBLE</small>
+        </div>
+        <div>
+          <span>{importMode === 'replace' ? 'Replace' : 'Append'}</span>
+          <small>IMPORT MODE</small>
+        </div>
+        <div>
+          <span>A–Z</span>
+          <small>SORT</small>
+        </div>
+      </section>
+
+      <section className="deck-toolbar">
+        <div className="list-search">
+          <Search size={18} strokeWidth={1.8} aria-hidden />
           <input
-            ref={fileInputRef}
-            type="file"
-            className="sr-only"
-            disabled={busy}
-            onChange={(e) => void onFileSelected(e)}
+            className="text-input"
+            type="search"
+            value={listSearch}
+            onChange={(e) => setListSearch(e.target.value)}
+            placeholder={cards.length ? `Search ${cards.length} words…` : 'Search…'}
+            autoComplete="off"
+            aria-label="Search deck"
           />
-          <FileUp className="size-4 shrink-0" aria-hidden />
-          Import file
-        </label>
-        <label
-          className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-medium text-violet-900 shadow-sm transition hover:bg-violet-100 dark:border-violet-800 dark:bg-violet-950/50 dark:text-violet-100 dark:hover:bg-violet-900/50 ${
-            busy ? 'pointer-events-none opacity-60' : ''
-          }`}
-        >
-          <input
-            ref={interviewCsvInputRef}
-            type="file"
-            accept=".csv"
-            className="sr-only"
-            disabled={busy}
-            onChange={(e) => void onInterviewCsvSelected(e)}
-          />
-          <MessageSquare className="size-4 shrink-0" aria-hidden />
-          Import interview CSV
-        </label>
-        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-          <span>On import:</span>
+        </div>
+        <div className="deck-actions">
+          <label className={`button button-secondary ${busy ? 'is-disabled' : ''}`}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="sr-only"
+              disabled={busy}
+              onChange={(e) => void onFileSelected(e)}
+            />
+            <FileUp size={16} aria-hidden />
+            <span className="desktop-only">Import</span>
+          </label>
+          <label className={`button button-ghost ${busy ? 'is-disabled' : ''}`}>
+            <input
+              ref={interviewCsvInputRef}
+              type="file"
+              accept=".csv"
+              className="sr-only"
+              disabled={busy}
+              onChange={(e) => void onInterviewCsvSelected(e)}
+            />
+            <MessageSquare size={16} aria-hidden />
+            <span className="desktop-only">Interview CSV</span>
+          </label>
+          <button
+            type="button"
+            className="button button-ghost"
+            onClick={() => void onExport()}
+            disabled={busy || cards.length === 0}
+            aria-label="Export for Anki"
+          >
+            <Download size={16} aria-hidden />
+            <span className="desktop-only">Export</span>
+          </button>
+          <button
+            type="button"
+            className="button button-ghost"
+            onClick={clearAll}
+            disabled={busy || cards.length === 0}
+            aria-label="Clear deck"
+          >
+            <Trash2 size={16} aria-hidden />
+          </button>
+        </div>
+      </section>
+
+      <div className="deck-meta-row">
+        <label className="import-mode">
+          <span>On import</span>
           <select
             value={importMode}
             onChange={(e) => setImportMode(e.target.value as 'append' | 'replace')}
             disabled={busy}
-            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-900"
           >
             <option value="append">Append</option>
             <option value="replace">Replace list</option>
           </select>
         </label>
-        <a
-          href={sampleAnkiDownloadUrl()}
-          download
-          className="inline-flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 underline-offset-2 hover:underline dark:text-indigo-400"
-        >
-          <Download className="size-4" aria-hidden />
+        <a href={sampleAnkiDownloadUrl()} download className="sample-link">
           Sample .txt
         </a>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => void onExport()}
-          disabled={busy || cards.length === 0}
-          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-600"
-        >
-          <Download className="size-4" aria-hidden />
-          Export for Anki
-        </button>
-        <button
-          type="button"
-          onClick={clearAll}
-          disabled={busy || cards.length === 0}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
-        >
-          <Trash2 className="size-4" aria-hidden />
-          Clear all
-        </button>
-      </div>
-
-      {message ? (
-        <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
-          {message}
-        </p>
-      ) : null}
+      {message ? <p className="ui-alert">{message}</p> : null}
 
       {cards.length > 0 ? (
-        <div className="space-y-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              <span>
-                Words ({listRows.length}
-                {listSearch.trim() ? ` of ${cards.length}` : ''}) — A–Z
-              </span>
-              <span className="hidden normal-case text-slate-400 dark:text-slate-500 sm:inline">
-                Click a row for full card
-              </span>
+        <>
+          <section className="word-list">
+            <div className="list-header">
+              <span>WORD</span>
+              <span>SOURCE</span>
+              <span></span>
+              <span></span>
             </div>
-            <label className="relative block shrink-0 sm:max-w-xs sm:flex-1">
-              <span className="sr-only">Search deck</span>
-              <Search
-                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
-                aria-hidden
-              />
-              <input
-                type="search"
-                value={listSearch}
-                onChange={(e) => setListSearch(e.target.value)}
-                placeholder="Search…"
-                autoComplete="off"
-                className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 shadow-sm outline-none ring-indigo-500/30 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400"
-              />
-            </label>
+            {listRows.length === 0 ? (
+              <p className="list-empty">No cards match your search.</p>
+            ) : (
+              listRows.map(({ card: c, originalIndex: i }) => (
+                <button
+                  key={`anki-${i}`}
+                  type="button"
+                  className="word-row"
+                  onClick={() => setSelectedIndex(i)}
+                  aria-label={`Open card: ${baseWordLabel(c.front)}`}
+                >
+                  <span className="word-cell">
+                    <strong>{baseWordLabel(c.front)}</strong>
+                    <small>Card {deckOrdinalByIndex.get(i) ?? i + 1}</small>
+                  </span>
+                  <span className="status">{c.kind ?? 'note'}</span>
+                  <span className="due" />
+                  <ChevronRight size={18} strokeWidth={1.8} aria-hidden />
+                </button>
+              ))
+            )}
+          </section>
+          <div className="list-footer">
+            <span>
+              Showing {listRows.length} of {cards.length} cards
+            </span>
+            <span>Sorted A–Z</span>
           </div>
-          {listRows.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
-              No cards match your search.
-            </p>
-          ) : (
-            <ul className="max-h-[min(70vh,36rem)] divide-y divide-slate-100 overflow-auto rounded-xl border border-slate-100 dark:divide-slate-800 dark:border-slate-800">
-              {listRows.map(({ card: c, originalIndex: i }) => (
-                <li key={`anki-${i}`}>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedIndex(i)}
-                    aria-label={`Open card: ${baseWordLabel(c.front)}`}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800/80"
-                  >
-                    <span className="min-w-0 flex-1 truncate text-base font-medium text-slate-900 dark:text-slate-50">
-                      {baseWordLabel(c.front)}
-                    </span>
-                    <ChevronRight className="size-5 shrink-0 text-slate-400 dark:text-slate-500" aria-hidden />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        </>
       ) : (
-        <p className="text-sm text-slate-500 dark:text-slate-400">No cards in the list yet.</p>
+        <p className="list-empty">No cards yet — import a file or add words from Workspace.</p>
       )}
 
       {selectedIndex !== null && cards[selectedIndex] ? (
@@ -472,6 +479,6 @@ export function AnkiDeckPanel({ cards, onCardsChange }: AnkiDeckPanelProps) {
           onPrevCard={goToPrevCardInAzOrder}
         />
       ) : null}
-    </section>
+    </>
   )
 }
