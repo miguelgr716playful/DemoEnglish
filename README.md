@@ -133,7 +133,7 @@ En producción SWA el frontend usa **mismo origen** (`VITE_API_BASE_URL` vacío 
 | `OpenAI__ChatModel` | Modelo (default `gpt-4o-mini`) |
 | `DictionaryApi__BaseUrl` | Override Free Dictionary |
 
-4. Push a `main`/`master` o ejecuta el workflow [`.github/workflows/azure-static-web-apps.yml`](.github/workflows/azure-static-web-apps.yml).
+4. Push a `main`/`master` o ejecuta el workflow [`.github/workflows/azure-static-web-apps.yml`](.github/workflows/azure-static-web-apps.yml) (*Actions → Azure Static Web Apps → Run workflow*). El job publica `frontend/dist` y la API precompilada (`swa-api/`).
 
 SPA + Functions gestionadas; no hace falta App Service aparte si usas solo `api/`.
 

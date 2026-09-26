@@ -2,7 +2,7 @@ name: Azure Static Web Apps
 
 # Deploys frontend + managed Azure Functions (api/).
 # Required repo secret: AZURE_STATIC_WEB_APPS_API_TOKEN (SWA → Manage deployment token).
-# Set SWA Application settings as needed: OpenAI__ApiKey, OpenAI__ChatModel
+# Optional SWA Application settings: OpenAI__ApiKey, OpenAI__ChatModel
 
 on:
   push:
@@ -22,19 +22,42 @@ jobs:
         with:
           submodules: true
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_API_BASE_URL: ''
+
+      - name: Publish Azure Functions
+        working-directory: api
+        run: dotnet publish DemoEnglish.Functions.csproj -c Release -o ../swa-api
+
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: frontend
-          api_location: api
-          output_location: dist
-          app_build_command: npm ci && npm run build
-        env:
-          # Same-origin /api on SWA
-          VITE_API_BASE_URL: ''
+          # Pre-built outputs (Oryx often struggles with .NET 10 isolated).
+          app_location: frontend/dist
+          api_location: swa-api
+          output_location: ''
+          skip_app_build: true
+          skip_api_build: true
 
   close_pull_request:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

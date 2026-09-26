@@ -5,6 +5,7 @@
 *.suo
 .vs/
 artifacts/
+swa-api/
 
 # Node / frontend
 frontend/node_modules/
