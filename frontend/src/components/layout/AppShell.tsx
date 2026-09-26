@@ -6,6 +6,7 @@ import {
   Search,
   Settings,
 } from 'lucide-react'
+import { ThemeSelector } from '../ThemeSelector'
 
 export type AppScreen = 'workspace' | 'deck' | 'interview'
 
@@ -75,6 +76,7 @@ export function AppShell({
             </div>
             <small>{deckCount === 0 ? 'Import or look up a word' : 'Open Deck to study'}</small>
           </div>
+          <ThemeSelector compact />
           <button type="button" className="nav-item" onClick={onOpenSettings}>
             <Settings size={20} strokeWidth={1.8} aria-hidden />
             <span>Settings</span>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { ExternalLink, X } from 'lucide-react'
 import { getApiSwaggerUrl, shouldShowIosDevSwaggerLink } from '../api/apiOrigin'
+import { ThemeSelector } from './ThemeSelector'
 import { TtsSettingsPanel } from './TtsSettingsPanel'
 
 type SettingsDialogProps = {
@@ -33,7 +34,8 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
           </button>
         </header>
         <div className="info-content">
-          <p className="settings-lead">Audio and read-aloud options for study cards.</p>
+          <p className="settings-lead">Theme, audio, and read-aloud options.</p>
+          <ThemeSelector />
           {shouldShowIosDevSwaggerLink() ? (
             <div className="modal-feature">
               <div>
