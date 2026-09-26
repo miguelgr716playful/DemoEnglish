@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen(options =>
             Title = "DemoEnglish API",
             Version = "v1",
             Description =
-                "Definiciones (Free Dictionary API) e importación Anki: texto (.txt/.csv) y paquetes .apkg (SQLite).",
+                "Definiciones (FreeDictionaryAPI.com / Wiktionary) e importación Anki: texto (.txt/.csv) y paquetes .apkg (SQLite).",
         });
 });
 

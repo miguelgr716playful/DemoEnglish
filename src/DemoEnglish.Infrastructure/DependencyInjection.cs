@@ -24,7 +24,7 @@ public static class DependencyInjection
             var optionsMonitor = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<DictionaryApiOptions>>();
             var opts = optionsMonitor.Value;
             var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl)
-                ? "https://api.dictionaryapi.dev/"
+                ? "https://freedictionaryapi.com/"
                 : opts.BaseUrl.Trim();
             if (!baseUrl.EndsWith('/'))
                 baseUrl += "/";

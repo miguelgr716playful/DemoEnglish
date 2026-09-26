@@ -5,74 +5,68 @@ namespace DemoEnglish.Infrastructure.Dictionary;
 
 public static class WordDefinitionMapper
 {
-    public static WordDefinitionDto? TryMap(FreeDictionaryEntry entry)
+    public static WordDefinitionDto? TryMap(FreeDictionaryApiResponse response)
     {
-        if (string.IsNullOrWhiteSpace(entry.Word))
+        if (response is null || string.IsNullOrWhiteSpace(response.Word))
             return null;
 
-        var phoneticText = ResolvePhoneticText(entry);
-        var audioUrl = ResolveAudioUrl(entry);
-        var (definition, partOfSpeech) = ResolvePrimaryDefinition(entry);
+        if (response.Entries is null || response.Entries.Count == 0)
+            return null;
+
+        string? phonetic = null;
+        string? partOfSpeech = null;
+        string? definition = null;
+
+        foreach (var entry in response.Entries)
+        {
+            phonetic ??= ResolvePhonetic(entry);
+            if (definition is not null)
+                continue;
+
+            if (entry.Senses is null)
+                continue;
+
+            foreach (var sense in entry.Senses)
+            {
+                if (string.IsNullOrWhiteSpace(sense.Definition))
+                    continue;
+
+                definition = sense.Definition.Trim();
+                partOfSpeech = string.IsNullOrWhiteSpace(entry.PartOfSpeech) ? null : entry.PartOfSpeech.Trim();
+                break;
+            }
+        }
 
         if (string.IsNullOrWhiteSpace(definition))
             return null;
 
         return new WordDefinitionDto(
-            Word: entry.Word.Trim(),
-            PhoneticText: string.IsNullOrWhiteSpace(phoneticText) ? null : phoneticText.Trim(),
-            AudioUrl: string.IsNullOrWhiteSpace(audioUrl) ? null : audioUrl.Trim(),
-            PrimaryDefinition: definition.Trim(),
-            PartOfSpeech: string.IsNullOrWhiteSpace(partOfSpeech) ? null : partOfSpeech.Trim());
+            Word: response.Word.Trim(),
+            PhoneticText: phonetic,
+            AudioUrl: null,
+            PrimaryDefinition: definition,
+            PartOfSpeech: partOfSpeech);
     }
 
-    private static string? ResolvePhoneticText(FreeDictionaryEntry entry)
+    private static string? ResolvePhonetic(FreeDictionaryApiEntry entry)
     {
-        if (!string.IsNullOrWhiteSpace(entry.Phonetic))
-            return entry.Phonetic;
-
-        if (entry.Phonetics is null)
+        if (entry.Pronunciations is null)
             return null;
 
-        foreach (var p in entry.Phonetics)
+        foreach (var p in entry.Pronunciations)
+        {
+            if (string.IsNullOrWhiteSpace(p.Text))
+                continue;
+            if (p.Type is null || p.Type.Equals("ipa", StringComparison.OrdinalIgnoreCase))
+                return p.Text.Trim();
+        }
+
+        foreach (var p in entry.Pronunciations)
         {
             if (!string.IsNullOrWhiteSpace(p.Text))
-                return p.Text;
+                return p.Text.Trim();
         }
 
         return null;
-    }
-
-    private static string? ResolveAudioUrl(FreeDictionaryEntry entry)
-    {
-        if (entry.Phonetics is null)
-            return null;
-
-        foreach (var p in entry.Phonetics)
-        {
-            if (!string.IsNullOrWhiteSpace(p.Audio))
-                return p.Audio;
-        }
-
-        return null;
-    }
-
-    private static (string? Definition, string? PartOfSpeech) ResolvePrimaryDefinition(FreeDictionaryEntry entry)
-    {
-        if (entry.Meanings is null)
-            return (null, null);
-
-        foreach (var meaning in entry.Meanings)
-        {
-            if (meaning.Definitions is null)
-                continue;
-
-            foreach (var def in meaning.Definitions)
-            {
-                if (!string.IsNullOrWhiteSpace(def.Definition))
-                    return (def.Definition, meaning.PartOfSpeech);
-            }
-        }
-
-        return (null, null);
     }
 }

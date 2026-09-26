@@ -102,7 +102,7 @@ function App() {
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Tech English vocabulary</h1>
                 <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
-                  Look up words with the Free Dictionary API, build a deck, and export plain text for{' '}
+                  Look up words with FreeDictionaryAPI (Wiktionary), build a deck, and export plain text for{' '}
                   <a
                     href="https://docs.ankiweb.net/importing/text-files.html"
                     className="text-indigo-600 underline-offset-2 hover:underline dark:text-indigo-400"
@@ -150,12 +150,12 @@ function App() {
         <footer className="text-center text-xs text-slate-400 dark:text-slate-500 sm:text-left">
           Dictionary data from{' '}
           <a
-            href="https://dictionaryapi.dev/"
+            href="https://freedictionaryapi.com/"
             className="text-indigo-600 underline-offset-2 hover:underline dark:text-indigo-400"
             target="_blank"
             rel="noreferrer"
           >
-            Free Dictionary API
+            FreeDictionaryAPI.com
           </a>
           . Deck tools support plain text and .apkg import (see README for limits).
         </footer>

@@ -9,10 +9,14 @@ namespace DemoEnglish.Tests.Dictionary;
 public sealed class DictionaryLookupServiceTests
 {
     [Fact]
-    public async Task LookupAsync_ReturnsWordNotFound_On404()
+    public async Task LookupAsync_ReturnsWordNotFound_OnEmptyEntries()
     {
+        const string json = """{"word":"notarealwordxyz123","entries":[]}""";
         var handler = new StubHttpMessageHandler(
-            _ => new HttpResponseMessage(HttpStatusCode.NotFound));
+            _ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
         using var client = CreateClient(handler);
         var factory = new FixedHttpClientFactory(client);
         var sut = new DictionaryLookupService(factory, NullLogger<DictionaryLookupService>.Instance);
@@ -26,7 +30,16 @@ public sealed class DictionaryLookupServiceTests
     public async Task LookupAsync_ReturnsFound_WhenApiReturnsValidPayload()
     {
         const string json = """
-            [{"word":"cache","phonetic":"/kæʃ/","meanings":[{"partOfSpeech":"noun","definitions":[{"definition":"A store of things that will be required in the future."}]}]}]
+            {
+              "word": "cache",
+              "entries": [
+                {
+                  "partOfSpeech": "noun",
+                  "pronunciations": [{ "type": "ipa", "text": "/kæʃ/" }],
+                  "senses": [{ "definition": "A store of things that will be required in the future." }]
+                }
+              ]
+            }
             """;
         var handler = new StubHttpMessageHandler(
             _ => new HttpResponseMessage(HttpStatusCode.OK)
@@ -48,7 +61,7 @@ public sealed class DictionaryLookupServiceTests
     private static HttpClient CreateClient(HttpMessageHandler handler) =>
         new(handler)
         {
-            BaseAddress = new Uri("https://api.dictionaryapi.dev/")
+            BaseAddress = new Uri("https://freedictionaryapi.com/")
         };
 
     private sealed class FixedHttpClientFactory : IHttpClientFactory

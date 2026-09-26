@@ -34,7 +34,8 @@ public sealed class DictionaryLookupService : IDictionaryLookupService
 
         var normalized = word.Trim();
         var client = _httpClientFactory.CreateClient(HttpClientName);
-        var path = $"api/v2/entries/en/{Uri.EscapeDataString(normalized)}";
+        // FreeDictionaryAPI.com — Wiktionary-backed (replaces the often-unreliable api.dictionaryapi.dev).
+        var path = $"api/v1/entries/en/{Uri.EscapeDataString(normalized)}";
 
         HttpResponseMessage response;
         try
@@ -65,10 +66,10 @@ public sealed class DictionaryLookupService : IDictionaryLookupService
         }
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        List<FreeDictionaryEntry>? entries;
+        FreeDictionaryApiResponse? payload;
         try
         {
-            entries = await JsonSerializer.DeserializeAsync<List<FreeDictionaryEntry>>(stream, JsonOptions, cancellationToken)
+            payload = await JsonSerializer.DeserializeAsync<FreeDictionaryApiResponse>(stream, JsonOptions, cancellationToken)
                 .ConfigureAwait(false);
         }
         catch (JsonException ex)
@@ -77,10 +78,10 @@ public sealed class DictionaryLookupService : IDictionaryLookupService
             return new DictionaryLookupResult.TransientError("Invalid response from the dictionary service.");
         }
 
-        if (entries is null || entries.Count == 0)
+        if (payload is null || payload.Entries is null || payload.Entries.Count == 0)
             return new DictionaryLookupResult.WordNotFound(normalized);
 
-        var dto = WordDefinitionMapper.TryMap(entries[0]);
+        var dto = WordDefinitionMapper.TryMap(payload);
         if (dto is null)
             return new DictionaryLookupResult.WordNotFound(normalized);
 

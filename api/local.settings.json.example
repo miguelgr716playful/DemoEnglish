@@ -3,8 +3,8 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "DictionaryApi__BaseUrl": "https://api.dictionaryapi.dev/",
-    "DictionaryApi__TimeoutSeconds": "15",
+    "DictionaryApi__BaseUrl": "https://freedictionaryapi.com/",
+    "DictionaryApi__TimeoutSeconds": "20",
     "OpenAI__ApiKey": "",
     "OpenAI__ChatModel": "gpt-4o-mini"
   },

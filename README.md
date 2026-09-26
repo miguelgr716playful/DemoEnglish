@@ -61,7 +61,7 @@ dotnet test DemoEnglish.slnx
 
 | Área | Qué hace |
 |------|----------|
-| **Diccionario** | Busca palabras (Free Dictionary API), IPA, audio, TTS, añadir al mazo Anki. |
+| **Diccionario** | Busca palabras ([FreeDictionaryAPI.com](https://freedictionaryapi.com/), Wiktionary), IPA, TTS, añadir al mazo Anki. |
 | **Mazo Anki** | Importar `.apkg` / texto / CSV de entrevista; exportar `.txt` para Anki; estudio en modal (2 caras), dictado y Word check. |
 | **Práctica** | Tiempos verbales, teoría, listas de verbos, vídeos curados con transcripción YouTube. |
 | **Interview** | Pantalla interna: dictado Web Speech, grabación/reproducción de audio (`MediaRecorder`), resumen IA opcional. |
@@ -131,7 +131,7 @@ En producción SWA el frontend usa **mismo origen** (`VITE_API_BASE_URL` vacío 
 |---------|-----|
 | `OpenAI__ApiKey` | Resumen de entrevista |
 | `OpenAI__ChatModel` | Modelo (default `gpt-4o-mini`) |
-| `DictionaryApi__BaseUrl` | Override Free Dictionary |
+| `DictionaryApi__BaseUrl` | Override diccionario (default `https://freedictionaryapi.com/`) |
 
 4. Push a `main`/`master` o ejecuta el workflow [`.github/workflows/azure-static-web-apps.yml`](.github/workflows/azure-static-web-apps.yml) (*Actions → Azure Static Web Apps → Run workflow*). El job publica `frontend/dist` y la API precompilada (`swa-api/`).
 
@@ -165,7 +165,7 @@ DemoEnglish/
 |----------|-----|
 | `DemoEnglish.Domain` | Núcleo |
 | `DemoEnglish.Application` | Contratos y DTOs (diccionario, Anki, OpenAI options) |
-| `DemoEnglish.Infrastructure` | Free Dictionary, SQLite `.apkg`, coach OpenAI, DI |
+| `DemoEnglish.Infrastructure` | FreeDictionaryAPI.com, SQLite `.apkg`, coach OpenAI, DI |
 | `DemoEnglish.Api` | Controllers, Swagger, CORS, uploads grandes |
 | `DemoEnglish.Functions` | HTTP triggers para SWA |
 
@@ -193,5 +193,5 @@ Ya cubierto por `.gitignore` / `api/.gitignore`:
 
 ## Licencia y datos
 
-Definiciones: [dictionaryapi.dev](https://dictionaryapi.dev/) (Free Dictionary API).  
+Definiciones: [FreeDictionaryAPI.com](https://freedictionaryapi.com/) (datos de Wiktionary, CC BY-SA 4.0).  
 Anki es marca de Ankitect Pty Ltd.; esta app solo genera/importa formatos compatibles con la [documentación de Anki](https://docs.ankiweb.net/).

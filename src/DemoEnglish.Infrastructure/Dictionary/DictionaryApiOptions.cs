@@ -4,7 +4,8 @@ public sealed class DictionaryApiOptions
 {
     public const string SectionName = "DictionaryApi";
 
-    public string BaseUrl { get; set; } = "https://api.dictionaryapi.dev/";
+    /// <summary>Origin for FreeDictionaryAPI.com (Wiktionary).</summary>
+    public string BaseUrl { get; set; } = "https://freedictionaryapi.com/";
 
-    public int TimeoutSeconds { get; set; } = 15;
+    public int TimeoutSeconds { get; set; } = 20;
 }
