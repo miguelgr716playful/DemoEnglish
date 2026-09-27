@@ -14,9 +14,17 @@ import {
 } from '../data/theoryReferenceTables'
 import { youtubeThumbnailUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
 import { useYoutubePlayer } from './YoutubeFloatingPlayer'
+import { ContentsIndex } from './ContentsIndex'
 
 function matchesQuery(haystack: string, q: string): boolean {
   return haystack.toLowerCase().includes(q)
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
 }
 
 function TheoryVideoChip({ video }: { video: TenseTheoryYoutube & { label?: string } }) {
@@ -114,6 +122,15 @@ export function TenseTheoryPage() {
 
   const empty = !showFeatured && blocks.length === 0 && extras.length === 0 && tables.length === 0
 
+  const indexItems = useMemo(() => {
+    const items: { id: string; label: string }[] = []
+    for (const t of tables) items.push({ id: `theory-ref-${t.id}`, label: t.title })
+    if (showFeatured) items.push({ id: 'theory-overview', label: 'All tenses (overview)' })
+    for (const b of blocks) items.push({ id: `theory-${b.id}`, label: b.title.replace(/\*/g, '') })
+    for (const x of extras) items.push({ id: `theory-extra-${slugify(x.title)}`, label: x.title })
+    return items
+  }, [tables, showFeatured, blocks, extras])
+
   return (
     <div className="theory-page page">
       <header className="page-topbar">
@@ -150,6 +167,8 @@ export function TenseTheoryPage() {
         <p className="theory-empty">No results for “{query.trim()}”.</p>
       ) : (
         <div className="theory-sections">
+          <ContentsIndex title="Tables & sections index" items={indexItems} />
+
           {tables.length > 0 ? (
             <div className="theory-ref-block">
               <h2 className="theory-extras-title">Subjects &amp; essentials</h2>
@@ -162,7 +181,7 @@ export function TenseTheoryPage() {
           ) : null}
 
           {showFeatured ? (
-            <section className="theory-card theory-card-featured">
+            <section className="theory-card theory-card-featured" id="theory-overview">
               <span className="eyebrow">OVERVIEW</span>
               <h2>All tenses</h2>
               <TheoryVideoChip video={verbTenseTheoryFeaturedVideo} />
@@ -191,7 +210,11 @@ export function TenseTheoryPage() {
             <div className="theory-extras">
               <h2 className="theory-extras-title">More patterns</h2>
               {extras.map((x) => (
-                <section key={x.title} className="theory-card theory-card-extra">
+                <section
+                  key={x.title}
+                  id={`theory-extra-${slugify(x.title)}`}
+                  className="theory-card theory-card-extra"
+                >
                   <h3>{x.title}</h3>
                   <div className="theory-extra-body">
                     {x.body

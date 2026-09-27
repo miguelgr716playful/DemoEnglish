@@ -12,6 +12,7 @@ import {
   type TopicPhrase,
   type TopicTable,
 } from '../data/weatherEnglish'
+import { ContentsIndex } from './ContentsIndex'
 
 function matchesQuery(haystack: string, q: string): boolean {
   return haystack.toLowerCase().includes(q)
@@ -151,10 +152,14 @@ export function TopicLearningPage({
         <div className="topic-sections">
           {visibleTables.length > 0 ? (
             <div className="theory-ref-block">
+              <ContentsIndex
+                title="Tables index"
+                items={visibleTables.map((t) => ({ id: `topic-table-${t.id}`, label: t.title }))}
+              />
               <h2 className="theory-extras-title">Vocabulary</h2>
               <div className="theory-ref-grid">
                 {visibleTables.map((table) => (
-                  <section key={table.id} className="theory-card theory-ref-card">
+                  <section key={table.id} id={`topic-table-${table.id}`} className="theory-card theory-ref-card">
                     {table.image ? (
                       <div className="topic-card-media">
                         <img src={table.image} alt={table.imageAlt ?? ''} loading="lazy" decoding="async" />
@@ -193,7 +198,7 @@ export function TopicLearningPage({
           ) : null}
 
           {visiblePhrases.length > 0 ? (
-            <div className="topic-phrases-block">
+            <div className="topic-phrases-block" id="topic-phrases">
               <h2 className="theory-extras-title">Useful phrases</h2>
               <ul className="topic-phrases">
                 {visiblePhrases.map((p) => (
