@@ -20,6 +20,7 @@ import { SearchBar } from './components/SearchBar'
 import { InterviewPracticeScreen } from './components/InterviewPracticeScreen'
 import { SettingsDialog } from './components/SettingsDialog'
 import { VideosPage } from './components/VideosPage'
+import { YoutubePlayerProvider } from './components/YoutubeFloatingPlayer'
 import { DictionaryRequestError, type WordDefinitionDto } from './types/dictionary'
 import type { AnkiCard } from './types/anki'
 
@@ -122,7 +123,7 @@ function App() {
   }
 
   return (
-    <>
+    <YoutubePlayerProvider>
       <AppShell
         screen={screen}
         onScreenChange={setScreen}
@@ -282,7 +283,7 @@ function App() {
       <VerbTenseTheoryDialog open={tenseTheoryOpen} onClose={() => setTenseTheoryOpen(false)} />
       <VerbListsDialog open={verbListsOpen} onClose={() => setVerbListsOpen(false)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-    </>
+    </YoutubePlayerProvider>
   )
 }
 

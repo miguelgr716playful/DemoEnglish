@@ -55,7 +55,7 @@ export function VideosPage() {
           <h1>
             Videos<span className="accent-dot">.</span>
           </h1>
-          <p>Browse like YouTube — tap a thumbnail to preview, or open the lesson on YouTube.</p>
+          <p>Tap a thumbnail to open a floating player — drag it, resize it, keep browsing.</p>
         </div>
         <div className="videos-hero-icon" aria-hidden>
           <Clapperboard size={28} strokeWidth={1.8} />

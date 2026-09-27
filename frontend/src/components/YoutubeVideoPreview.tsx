@@ -1,6 +1,6 @@
-import { useState } from 'react'
 import { ExternalLink, Play } from 'lucide-react'
-import { youtubeEmbedUrl, youtubeThumbnailUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
+import { youtubeThumbnailUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
+import { useYoutubePlayer } from './YoutubeFloatingPlayer'
 
 type YoutubeVideoPreviewProps = {
   videoId: string
@@ -10,7 +10,7 @@ type YoutubeVideoPreviewProps = {
   className?: string
 }
 
-/** YouTube-style card: thumbnail grid cell, click to play embed. */
+/** YouTube-style card: thumbnail opens the floating adaptive player. */
 export function YoutubeVideoPreview({
   videoId,
   title,
@@ -18,43 +18,29 @@ export function YoutubeVideoPreview({
   category,
   className = '',
 }: YoutubeVideoPreviewProps) {
-  const [playing, setPlaying] = useState(false)
+  const { openPlayer, active } = useYoutubePlayer()
+  const isActive = active?.videoId === videoId
 
   return (
-    <article className={`yt-preview ${className}`.trim()}>
+    <article className={`yt-preview${isActive ? ' is-playing' : ''} ${className}`.trim()}>
       <div className="yt-preview-media">
-        {playing ? (
-          <iframe
-            className="yt-preview-iframe"
-            src={`${youtubeEmbedUrl(videoId)}&autoplay=1`}
-            title={title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            referrerPolicy="strict-origin-when-cross-origin"
-          />
-        ) : (
-          <button
-            type="button"
-            className="yt-preview-thumb"
-            onClick={() => setPlaying(true)}
-            aria-label={`Play preview: ${title}`}
-          >
-            <img src={youtubeThumbnailUrl(videoId)} alt="" loading="lazy" decoding="async" />
-            <span className="yt-preview-play" aria-hidden>
-              <Play size={20} strokeWidth={2} fill="currentColor" />
-            </span>
-          </button>
-        )}
+        <button
+          type="button"
+          className="yt-preview-thumb"
+          onClick={() => openPlayer({ videoId, title })}
+          aria-label={`Play: ${title}`}
+          aria-pressed={isActive}
+        >
+          <img src={youtubeThumbnailUrl(videoId)} alt="" loading="lazy" decoding="async" />
+          <span className="yt-preview-play" aria-hidden>
+            <Play size={20} strokeWidth={2} fill="currentColor" />
+          </span>
+        </button>
       </div>
       <div className="yt-preview-meta">
-        <a
-          href={youtubeWatchUrl(videoId)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="yt-preview-title"
-        >
+        <button type="button" className="yt-preview-title" onClick={() => openPlayer({ videoId, title })}>
           {title}
-        </a>
+        </button>
         {category ? <span className="yt-preview-channel">{category}</span> : null}
         {hint ? <small>{hint}</small> : null}
         <a href={youtubeWatchUrl(videoId)} target="_blank" rel="noopener noreferrer" className="yt-preview-open">
