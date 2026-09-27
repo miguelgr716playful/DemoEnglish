@@ -16,8 +16,7 @@ export function TtsSettingsPanel() {
   const [rate, setRate] = useState(1)
 
   useEffect(() => {
-    const parsed = parseStoredRate()
-    setRate(parsed)
+    setRate(parseStoredRate())
   }, [])
 
   useEffect(() => {
@@ -42,43 +41,45 @@ export function TtsSettingsPanel() {
 
   if (!available) {
     return (
-      <div className="w-full rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
+      <div className="tts-panel tts-panel-unavailable">
         Read-aloud (browser voice) is not available in this browser.
       </div>
     )
   }
 
   return (
-    <div className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-slate-800 dark:text-slate-100">
-        <Volume2 className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" aria-hidden />
-        <span>Read aloud</span>
+    <div className="tts-panel">
+      <div className="tts-panel-head">
+        <Volume2 size={16} strokeWidth={2} aria-hidden className="tts-panel-icon" />
+        <strong>Read aloud</strong>
       </div>
-      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        Applies to read-aloud on dictionary results and study cards (Parts 1 and 2). Uses your browser or system voices.
+      <p className="tts-panel-lead">
+        Applies to read-aloud on dictionary results and study cards (Parts 1 and 2). Uses your browser or system
+        voices.
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <label className="inline-flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-          <span className="shrink-0">Voice</span>
-          <select
-            value={voiceUri}
-            onChange={(e) => {
-              const next = e.target.value
-              setVoiceUri(next)
-              window.localStorage.setItem(TTS_VOICE_STORAGE_KEY, next)
-              notifyTtsSettingsChanged()
-            }}
-            className="max-w-[min(100%,18rem)] rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-800 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
-          >
-            {voices.map((v) => (
-              <option key={v.voiceURI} value={v.voiceURI}>
-                {v.name} ({v.lang})
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="inline-flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
-          <span className="shrink-0">Speed</span>
+      <label className="tts-row">
+        <span className="tts-row-label">Voice</span>
+        <select
+          value={voiceUri}
+          title={voices.find((v) => v.voiceURI === voiceUri)?.name}
+          onChange={(e) => {
+            const next = e.target.value
+            setVoiceUri(next)
+            window.localStorage.setItem(TTS_VOICE_STORAGE_KEY, next)
+            notifyTtsSettingsChanged()
+          }}
+          className="tts-select"
+        >
+          {voices.map((v) => (
+            <option key={v.voiceURI} value={v.voiceURI}>
+              {v.name} ({v.lang})
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="tts-row">
+        <span className="tts-row-label">Speed</span>
+        <div className="tts-speed">
           <input
             type="range"
             min={0.5}
@@ -91,11 +92,12 @@ export function TtsSettingsPanel() {
               window.localStorage.setItem(TTS_RATE_STORAGE_KEY, String(next))
               notifyTtsSettingsChanged()
             }}
-            className="h-2 w-28"
+            className="tts-range"
+            aria-valuetext={`${Math.round(rate * 100)} percent`}
           />
-          <span className="w-10 text-right tabular-nums text-slate-700 dark:text-slate-200">{Math.round(rate * 100)}%</span>
-        </label>
-      </div>
+          <span className="tts-rate-value">{Math.round(rate * 100)}%</span>
+        </div>
+      </label>
     </div>
   )
 }

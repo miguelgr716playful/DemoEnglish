@@ -22,8 +22,14 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   if (!open) return null
 
   return (
-    <div className="modal-backdrop" role="presentation">
-      <section className="info-modal" role="dialog" aria-modal="true" aria-labelledby="app-settings-title">
+    <div className="modal-backdrop settings-backdrop" role="presentation" onClick={onClose}>
+      <section
+        className="info-modal settings-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="app-settings-title"
+        onClick={(e) => e.stopPropagation()}
+      >
         <header>
           <div>
             <span className="eyebrow">PREFERENCES</span>
@@ -33,7 +39,7 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
             <X size={18} aria-hidden />
           </button>
         </header>
-        <div className="info-content">
+        <div className="info-content settings-content">
           <p className="settings-lead">Theme, audio, and read-aloud options.</p>
           <ThemeSelector />
           {shouldShowIosDevSwaggerLink() ? (
