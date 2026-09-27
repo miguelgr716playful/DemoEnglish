@@ -7,6 +7,11 @@ import {
   verbTenseTheoryFeaturedVideo,
   type TenseTheoryYoutube,
 } from '../data/verbTenseTheory'
+import {
+  theoryReferenceTables,
+  theoryTableSearchBlob,
+  type TheoryRefTable,
+} from '../data/theoryReferenceTables'
 import { youtubeThumbnailUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
 import { useYoutubePlayer } from './YoutubeFloatingPlayer'
 
@@ -44,6 +49,39 @@ function TheoryVideoChip({ video }: { video: TenseTheoryYoutube & { label?: stri
   )
 }
 
+function TheoryRefTableCard({ table }: { table: TheoryRefTable }) {
+  return (
+    <section className="theory-card theory-ref-card" id={`theory-ref-${table.id}`}>
+      <h3>{table.title}</h3>
+      {table.note ? <p className="theory-ref-note">{table.note}</p> : null}
+      <div className="theory-ref-wrap">
+        <table className="theory-ref-table">
+          <thead>
+            <tr>
+              {table.headers.map((h) => (
+                <th key={h} scope="col">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {table.rows.map((row, ri) => (
+              <tr key={`${table.id}-${ri}`}>
+                {row.map((cell, ci) => (
+                  <td key={`${table.id}-${ri}-${ci}`} className={ci === 0 ? 'theory-ref-key' : undefined}>
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )
+}
+
 export function TenseTheoryPage() {
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
@@ -62,6 +100,11 @@ export function TenseTheoryPage() {
     )
   }, [q])
 
+  const tables = useMemo(() => {
+    if (!q) return theoryReferenceTables
+    return theoryReferenceTables.filter((t) => matchesQuery(theoryTableSearchBlob(t), q))
+  }, [q])
+
   const showFeatured =
     !q ||
     matchesQuery(
@@ -69,13 +112,15 @@ export function TenseTheoryPage() {
       q,
     )
 
-  const empty = !showFeatured && blocks.length === 0 && extras.length === 0
+  const empty = !showFeatured && blocks.length === 0 && extras.length === 0 && tables.length === 0
 
   return (
     <div className="theory-page page">
       <header className="page-topbar">
         <span className="eyebrow">GRAMMAR REFERENCE</span>
-        <span className="date-label">{verbTenseTheoryBlocks.length} tenses · formulas</span>
+        <span className="date-label">
+          {verbTenseTheoryBlocks.length} tenses · {theoryReferenceTables.length} tables
+        </span>
       </header>
 
       <section className="theory-hero">
@@ -83,7 +128,7 @@ export function TenseTheoryPage() {
           <h1>
             Tense formulas<span className="accent-dot">.</span>
           </h1>
-          <p>Quick reference for English verb tenses — search by name, use, or example.</p>
+          <p>Quick reference — subjects, helpers, and verb tense formulas. Search anything.</p>
         </div>
         <div className="theory-hero-icon" aria-hidden>
           <GraduationCap size={28} strokeWidth={1.8} />
@@ -96,15 +141,26 @@ export function TenseTheoryPage() {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search tense (e.g. present perfect, passive…)"
-          aria-label="Search verb tenses"
+          placeholder="Search (e.g. subjects, present perfect, do/does…)"
+          aria-label="Search grammar reference"
         />
       </label>
 
       {empty ? (
-        <p className="theory-empty">No tenses match “{query.trim()}”.</p>
+        <p className="theory-empty">No results for “{query.trim()}”.</p>
       ) : (
         <div className="theory-sections">
+          {tables.length > 0 ? (
+            <div className="theory-ref-block">
+              <h2 className="theory-extras-title">Subjects &amp; essentials</h2>
+              <div className="theory-ref-grid">
+                {tables.map((t) => (
+                  <TheoryRefTableCard key={t.id} table={t} />
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           {showFeatured ? (
             <section className="theory-card theory-card-featured">
               <span className="eyebrow">OVERVIEW</span>
