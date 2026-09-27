@@ -3,6 +3,7 @@ import {
   BookOpen,
   Clapperboard,
   CloudSun,
+  Clock3,
   Layers,
   ListTree,
   Mic,
@@ -17,6 +18,7 @@ export type AppScreen =
   | 'deck'
   | 'videos'
   | 'theory'
+  | 'tenses'
   | 'verbs'
   | 'weather'
   | 'vacations'
@@ -52,6 +54,7 @@ export function AppShell({
     { id: 'workspace', label: 'Workspace', icon: Search },
     { id: 'deck', label: 'Deck', icon: Layers },
     { id: 'theory', label: 'Theory', icon: BookOpen },
+    { id: 'tenses', label: 'Tenses', icon: Clock3 },
     { id: 'verbs', label: 'Verbs', icon: ListTree },
     { id: 'weather', label: 'Weather', icon: CloudSun },
     { id: 'vacations', label: 'Vacations', icon: Palmtree },

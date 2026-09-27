@@ -19,6 +19,7 @@ import { InterviewPracticeScreen } from './components/InterviewPracticeScreen'
 import { SettingsDialog } from './components/SettingsDialog'
 import { VideosPage } from './components/VideosPage'
 import { TenseTheoryPage } from './components/TenseTheoryPage'
+import { TensesPage } from './components/TensesPage'
 import { VerbListsPage } from './components/VerbListsPage'
 import { WeatherPage } from './components/WeatherPage'
 import { VacationsPage } from './components/VacationsPage'
@@ -44,9 +45,9 @@ function hasSpanishIndicators(text: string): boolean {
 }
 
 const TOOLS = [
-  { label: 'Verb tenses', caption: 'Quick practice', icon: Sparkles, open: 'verbPractice' as const },
-  { label: 'Tense theory', caption: 'Reference', icon: BookOpen, open: 'tenseTheory' as const },
-  { label: 'Verb lists', caption: 'Irregular & forms', icon: List, open: 'verbLists' as const },
+  { label: 'Verb practice', caption: 'Quick drills', icon: Sparkles, open: 'verbPractice' as const },
+  { label: 'Tenses', caption: 'Formulas + videos', icon: BookOpen, open: 'tenses' as const },
+  { label: 'Theory', caption: 'Subjects & helpers', icon: List, open: 'tenseTheory' as const },
   { label: 'Videos', caption: 'By category', icon: Clapperboard, open: 'videos' as const },
 ]
 
@@ -122,7 +123,7 @@ function App() {
   const openTool = (id: (typeof TOOLS)[number]['open']) => {
     if (id === 'verbPractice') setVerbPracticeOpen(true)
     if (id === 'tenseTheory') setScreen('theory')
-    if (id === 'verbLists') setScreen('verbs')
+    if (id === 'tenses') setScreen('tenses')
     if (id === 'videos') setScreen('videos')
   }
 
@@ -280,7 +281,9 @@ function App() {
 
         {screen === 'videos' ? <VideosPage /> : null}
 
-        {screen === 'theory' ? <TenseTheoryPage onOpenVideos={() => setScreen('videos')} /> : null}
+        {screen === 'theory' ? <TenseTheoryPage onOpenTenses={() => setScreen('tenses')} /> : null}
+
+        {screen === 'tenses' ? <TensesPage /> : null}
 
         {screen === 'verbs' ? <VerbListsPage onAddToDeck={addCardsToDeck} /> : null}
 
