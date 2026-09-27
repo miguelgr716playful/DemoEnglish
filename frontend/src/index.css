@@ -2167,3 +2167,228 @@ html[data-theme="dark"] .verbs-tabs button.active {
     max-height: 240px;
   }
 }
+
+/* --- Fluency practice --- */
+.fluency-modes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.fluency-modes button {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+}
+.fluency-modes button strong {
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+.fluency-modes button span {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.fluency-modes button.active {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--teal) 40%, transparent);
+  background: color-mix(in srgb, var(--teal) 10%, var(--surface));
+}
+.fluency-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 22px 24px 26px;
+  display: grid;
+  gap: 16px;
+}
+.fluency-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.fluency-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.fluency-progress {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.fluency-script {
+  margin: 0;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.45;
+}
+.fluency-expand-script {
+  font-size: 24px;
+}
+.fluency-tip {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.fluency-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.fluency-steps {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+}
+.fluency-prompt {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+}
+.fluency-starters {
+  display: grid;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+.fluency-starters ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink);
+}
+.fluency-timer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.fluency-durations {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 65%, var(--surface));
+}
+.fluency-durations button {
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fluency-durations button.active {
+  background: var(--teal);
+  color: var(--mark-ink);
+}
+.fluency-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 88px;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+}
+.fluency-timer.is-live {
+  color: var(--teal);
+}
+.fluency-timer.is-done {
+  color: var(--danger, #ef4444);
+}
+.fluency-chunk-phrase {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: -0.04em;
+}
+.fluency-chunk-use {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+.fluency-chunk-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.fluency-chunk-pill {
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 70%, var(--surface));
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fluency-chunk-pill.active {
+  border-color: var(--teal);
+  background: color-mix(in srgb, var(--teal) 14%, var(--surface));
+}
+.fluency-expand-track {
+  display: flex;
+  gap: 6px;
+}
+.fluency-expand-track span {
+  flex: 1;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--line);
+}
+.fluency-expand-track span.on {
+  background: var(--teal);
+}
+.fluency-live-hint {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--teal) 35%, var(--line));
+  background: color-mix(in srgb, var(--teal) 12%, var(--surface));
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+@media (max-width: 900px) {
+  .fluency-modes {
+    grid-template-columns: 1fr 1fr;
+  }
+  .fluency-script {
+    font-size: 18px;
+  }
+}
+

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import {
+  AudioLines,
   BookMarked,
   BookOpen,
   Clapperboard,
@@ -22,6 +23,7 @@ export type AppScreen =
   | 'verbs'
   | 'topics'
   | 'stories'
+  | 'fluency'
   | 'interview'
 
 type AppShellProps = {
@@ -58,6 +60,7 @@ export function AppShell({
     { id: 'verbs', label: 'Verbs', icon: ListTree },
     { id: 'topics', label: 'Topics', icon: LayoutGrid },
     { id: 'stories', label: 'Stories', icon: BookMarked },
+    { id: 'fluency', label: 'Fluency', icon: AudioLines },
     { id: 'videos', label: 'Videos', icon: Clapperboard },
     { id: 'interview', label: 'Interview', icon: Mic },
   ]
