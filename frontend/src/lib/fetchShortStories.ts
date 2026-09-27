@@ -1,5 +1,7 @@
 /** Short stories from https://shortstories-api.onrender.com (no API key). */
 
+import { curatedTopicStories } from '../data/curatedTopicStories'
+
 export type ShortStory = {
   id: string
   title: string
@@ -40,15 +42,25 @@ export async function fetchShortStories(): Promise<ShortStory[]> {
   if (inflight) return inflight
 
   inflight = (async () => {
-    const response = await fetch(STORIES_URL, { headers: { Accept: 'application/json' } })
-    if (!response.ok) throw new Error(`Stories API failed (${response.status})`)
-    const data = (await response.json()) as ApiStory[]
-    if (!Array.isArray(data) || data.length === 0) throw new Error('No stories returned')
-    const stories = data
-      .map((item, i) => normalize(item, i))
-      .filter((s): s is ShortStory => Boolean(s))
-    cachedStories = stories
-    return stories
+    try {
+      const response = await fetch(STORIES_URL, { headers: { Accept: 'application/json' } })
+      if (!response.ok) throw new Error(`Stories API failed (${response.status})`)
+      const data = (await response.json()) as ApiStory[]
+      if (!Array.isArray(data) || data.length === 0) throw new Error('No stories returned')
+      const stories = data
+        .map((item, i) => normalize(item, i))
+        .filter((s): s is ShortStory => Boolean(s))
+      // Curated learner stories first (weather, vacations, …), then API fables.
+      const merged = [
+        ...curatedTopicStories,
+        ...stories.filter((s) => !curatedTopicStories.some((c) => c.id === s.id)),
+      ]
+      cachedStories = merged
+      return merged
+    } catch {
+      cachedStories = [...curatedTopicStories]
+      return cachedStories
+    }
   })().finally(() => {
     inflight = null
   })
@@ -57,6 +69,11 @@ export async function fetchShortStories(): Promise<ShortStory[]> {
 }
 
 export async function fetchRandomShortStory(): Promise<ShortStory> {
+  const all = await fetchShortStories()
+  // Prefer curated stories a bit more often so weather/vacation practice shows up.
+  if (curatedTopicStories.length > 0 && Math.random() < 0.35) {
+    return curatedTopicStories[Math.floor(Math.random() * curatedTopicStories.length)]!
+  }
   try {
     const response = await fetch(RANDOM_URL, { headers: { Accept: 'application/json' } })
     if (response.ok) {
@@ -67,7 +84,6 @@ export async function fetchRandomShortStory(): Promise<ShortStory> {
   } catch {
     /* fall through to list */
   }
-  const all = await fetchShortStories()
   return all[Math.floor(Math.random() * all.length)]!
 }
 

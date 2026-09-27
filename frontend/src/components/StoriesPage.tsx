@@ -93,7 +93,7 @@ export function StoriesPage() {
       <header className="page-topbar">
         <span className="eyebrow">READING PRACTICE</span>
         <span className="date-label">
-          {loading ? 'Loading…' : `${stories.length} Aesop-style tales`}
+          {loading ? 'Loading…' : `${stories.length} stories · weather & vacations first`}
         </span>
       </header>
 
