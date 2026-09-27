@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
-import { ChevronDown, ExternalLink, ListVideo, X } from 'lucide-react'
+import { ChevronDown, ListVideo, X } from 'lucide-react'
 import { curatedEnglishVideoTopics } from '../data/curatedEnglishVideos'
-import { youtubeWatchUrl } from '../lib/youtubeEmbed'
-import { YoutubeTranscriptDisclosure } from './YoutubeTranscriptDisclosure'
+import { YoutubeVideoPreview } from './YoutubeVideoPreview'
 
 type CuratedEnglishVideosDialogProps = {
   open: boolean
@@ -37,7 +36,7 @@ export function CuratedEnglishVideosDialog({ open, onClose }: CuratedEnglishVide
       >
         <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 dark:border-slate-800 sm:px-6">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
               <ListVideo className="size-5" aria-hidden />
             </span>
             <div>
@@ -47,9 +46,8 @@ export function CuratedEnglishVideosDialog({ open, onClose }: CuratedEnglishVide
               >
                 English video picks
               </h2>
-              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                Curated YouTube links — open each section to see the list. Expand “Read captions” to load English
-                subtitles in the app.
+              <p className="mt-0.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                Curated YouTube lessons — preview in the app or open on YouTube.
               </p>
             </div>
           </div>
@@ -76,27 +74,13 @@ export function CuratedEnglishVideosDialog({ open, onClose }: CuratedEnglishVide
                 />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-slate-900 dark:text-slate-50">{topic.heading}</p>
-                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{topic.description}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600 dark:text-slate-400">{topic.description}</p>
                 </div>
               </summary>
-              <ul className="space-y-2 border-t border-slate-200 px-4 py-3 dark:border-slate-700">
+              <ul className="grid gap-3 border-t border-slate-200 px-4 py-3 dark:border-slate-700 sm:grid-cols-2">
                 {topic.picks.map((pick) => (
-                  <li key={`${topic.id}-${pick.videoId}`} className="space-y-2">
-                    <a
-                      href={youtubeWatchUrl(pick.videoId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group/link inline-flex gap-2 text-sm font-medium text-indigo-700 underline-offset-2 hover:text-indigo-900 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
-                    >
-                      <ExternalLink className="mt-0.5 size-3.5 shrink-0 opacity-70 group-hover/link:opacity-100" aria-hidden />
-                      <span>
-                        <span className="block">{pick.title}</span>
-                        {pick.hint ? (
-                          <span className="mt-1 block font-normal text-slate-600 dark:text-slate-400">{pick.hint}</span>
-                        ) : null}
-                      </span>
-                    </a>
-                    <YoutubeTranscriptDisclosure videoId={pick.videoId} lang="en" className="bg-slate-50 dark:bg-slate-900/80" />
+                  <li key={`${topic.id}-${pick.videoId}`}>
+                    <YoutubeVideoPreview videoId={pick.videoId} title={pick.title} hint={pick.hint} />
                   </li>
                 ))}
               </ul>
@@ -117,7 +101,7 @@ export function CuratedVideosMenuButton({ onClick, open }: { onClick: () => void
       aria-haspopup="dialog"
       aria-expanded={open}
     >
-      <ListVideo className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" aria-hidden />
+      <ListVideo className="size-4 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
       Learning videos
     </button>
   )

@@ -3,6 +3,11 @@ export function youtubeWatchUrl(videoId: string): string {
   return `https://www.youtube.com/watch?v=${videoId}`
 }
 
+/** Static thumbnail for list/preview cards (hqdefault is reliably available). */
+export function youtubeThumbnailUrl(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+}
+
 /**
  * Embed URL for iframes. Uses www.youtube.com (not nocookie) and origin so Error 153 is less likely.
  * Pair with referrerPolicy="strict-origin-when-cross-origin" on the iframe.

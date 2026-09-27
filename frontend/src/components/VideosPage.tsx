@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Clapperboard, ExternalLink } from 'lucide-react'
+import { Clapperboard } from 'lucide-react'
 import {
   countLibraryVideos,
   videoLibraryCategories,
   type VideoLibraryCategory,
 } from '../data/videoLibrary'
-import { youtubeWatchUrl } from '../lib/youtubeEmbed'
-import { YoutubeTranscriptDisclosure } from './YoutubeTranscriptDisclosure'
+import { YoutubeVideoPreview } from './YoutubeVideoPreview'
 
 const ALL_ID = 'all'
 
@@ -22,7 +21,9 @@ export function VideosPage() {
     <div className="videos-page page">
       <header className="page-topbar">
         <span className="eyebrow">LEARNING LIBRARY</span>
-        <span className="date-label">{total} videos · {categories.length} categories</span>
+        <span className="date-label">
+          {total} videos · {categories.length} categories
+        </span>
       </header>
 
       <section className="videos-hero">
@@ -30,7 +31,7 @@ export function VideosPage() {
           <h1>
             Videos by category<span className="accent-dot">.</span>
           </h1>
-          <p>Curated YouTube lessons for tech English — open on YouTube or expand captions in the app.</p>
+          <p>Curated YouTube lessons for tech English — preview here or open on YouTube.</p>
         </div>
         <div className="videos-hero-icon" aria-hidden>
           <Clapperboard size={28} strokeWidth={1.8} />
@@ -66,24 +67,14 @@ export function VideosPage() {
               <h2>{topic.heading}</h2>
               <p>{topic.description}</p>
             </div>
-            <ul className="videos-list">
+            <ul className="videos-grid">
               {topic.picks.map((pick) => (
-                <li key={`${topic.id}-${pick.videoId}`} className="videos-row">
-                  <a
-                    href={youtubeWatchUrl(pick.videoId)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="videos-row-link"
-                  >
-                    <span className="videos-row-icon">
-                      <ExternalLink size={16} strokeWidth={1.8} aria-hidden />
-                    </span>
-                    <span className="videos-row-text">
-                      <strong>{pick.title}</strong>
-                      {pick.hint ? <small>{pick.hint}</small> : null}
-                    </span>
-                  </a>
-                  <YoutubeTranscriptDisclosure videoId={pick.videoId} lang="en" className="videos-captions" />
+                <li key={`${topic.id}-${pick.videoId}`}>
+                  <YoutubeVideoPreview
+                    videoId={pick.videoId}
+                    title={pick.title}
+                    hint={pick.hint}
+                  />
                 </li>
               ))}
             </ul>

@@ -7,8 +7,7 @@ import {
   verbTenseTheoryFeaturedVideo,
   type TenseTheoryYoutube,
 } from '../data/verbTenseTheory'
-import { youtubeEmbedUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
-import { YoutubeTranscriptDisclosure } from './YoutubeTranscriptDisclosure'
+import { youtubeEmbedUrl, youtubeThumbnailUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
 
 function TenseTheoryYoutubeDetails({
   video,
@@ -25,6 +24,13 @@ function TenseTheoryYoutubeDetails({
       <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 marker:content-none dark:text-slate-300 [&::-webkit-details-marker]:hidden">
         <Play className="size-4 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
         <span className="min-w-0 flex-1">{title}</span>
+        <img
+          src={youtubeThumbnailUrl(video.videoId)}
+          alt=""
+          className="h-9 w-14 shrink-0 rounded object-cover"
+          loading="lazy"
+          decoding="async"
+        />
         <ChevronDown
           className="size-4 shrink-0 text-slate-400 transition group-open:rotate-180 dark:text-slate-500"
           aria-hidden
@@ -51,12 +57,6 @@ function TenseTheoryYoutubeDetails({
           Open on YouTube
           <ExternalLink className="size-3.5 shrink-0 opacity-80" aria-hidden />
         </a>
-        <YoutubeTranscriptDisclosure
-          videoId={video.videoId}
-          lang="en"
-          summaryLabel="Read captions"
-          className="mt-2 border-slate-200 dark:border-slate-600"
-        />
       </div>
     </details>
   )
