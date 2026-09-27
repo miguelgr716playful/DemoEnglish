@@ -3,9 +3,10 @@ import { BookMarked, Loader2, RefreshCw, Search } from 'lucide-react'
 import {
   fetchRandomShortStory,
   fetchShortStories,
-  storySpeakText,
+  storySpeakLayout,
   type ShortStory,
 } from '../lib/fetchShortStories'
+import { HighlightedText, localSpeechRange, type SpeechWordRange } from './HighlightedText'
 import { SpeakTextButton } from './SpeakTextButton'
 
 export function StoriesPage() {
@@ -15,6 +16,7 @@ export function StoriesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [randomBusy, setRandomBusy] = useState(false)
+  const [wordRange, setWordRange] = useState<SpeechWordRange | null>(null)
   const bodyRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -51,6 +53,11 @@ export function StoriesPage() {
   }, [stories, query])
 
   const selected = stories.find((s) => s.id === selectedId) ?? filtered[0] ?? null
+  const speakLayout = useMemo(() => (selected ? storySpeakLayout(selected) : null), [selected])
+
+  useEffect(() => {
+    setWordRange(null)
+  }, [selected?.id])
 
   const loadRandom = async () => {
     setRandomBusy(true)
@@ -160,27 +167,60 @@ export function StoriesPage() {
             )}
           </aside>
 
-          {selected ? (
+          {selected && speakLayout ? (
             <article className="stories-reader" aria-live="polite">
               <header className="stories-reader-head">
                 <div>
-                  <h2>{selected.title}</h2>
-                  <p className="stories-author">{selected.author}</p>
+                  <h2>
+                    <HighlightedText
+                      text={speakLayout.title}
+                      range={localSpeechRange(
+                        wordRange,
+                        speakLayout.offsets.title,
+                        speakLayout.title.length,
+                      )}
+                    />
+                  </h2>
+                  <p className="stories-author">
+                    <HighlightedText
+                      text={speakLayout.byline}
+                      range={localSpeechRange(
+                        wordRange,
+                        speakLayout.offsets.byline,
+                        speakLayout.byline.length,
+                      )}
+                    />
+                  </p>
                 </div>
                 <SpeakTextButton
-                  text={storySpeakText(selected)}
+                  text={speakLayout.text}
                   resetSignal={selected.id}
                   selectionScopeRef={bodyRef}
+                  onWordRangeChange={setWordRange}
                 />
               </header>
               <div className="stories-body" ref={bodyRef}>
-                {selected.story.split(/\n+/).map((para, i) => (
-                  <p key={`${selected.id}-p-${i}`}>{para}</p>
-                ))}
-                {selected.moral ? (
+                <p className="stories-story-block">
+                  <HighlightedText
+                    text={speakLayout.story}
+                    range={localSpeechRange(
+                      wordRange,
+                      speakLayout.offsets.story,
+                      speakLayout.story.length,
+                    )}
+                  />
+                </p>
+                {speakLayout.moralLine && selected.moral ? (
                   <p className="stories-moral">
                     <span>Moral</span>
-                    {selected.moral}
+                    <HighlightedText
+                      text={selected.moral}
+                      range={localSpeechRange(
+                        wordRange,
+                        speakLayout.offsets.moral + 'Moral: '.length,
+                        selected.moral.length,
+                      )}
+                    />
                   </p>
                 ) : null}
               </div>

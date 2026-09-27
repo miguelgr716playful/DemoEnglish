@@ -6,24 +6,36 @@ import {
   supportsSpeechSynthesis,
   TTS_SETTINGS_CHANGED_EVENT,
 } from '../lib/ttsSettings'
+import { speechWordEnd, type SpeechWordRange } from './HighlightedText'
 
 type SpeakTextButtonProps = {
   text: string
   /** Changes when the source text/card changes so playback state resets. */
   resetSignal: number | string
   selectionScopeRef?: { current: HTMLElement | null }
+  /** Fired with the active word range in `text` while speaking the full text (not a selection). */
+  onWordRangeChange?: (range: SpeechWordRange | null) => void
 }
 
-export function SpeakTextButton({ text, resetSignal, selectionScopeRef }: SpeakTextButtonProps) {
+export function SpeakTextButton({
+  text,
+  resetSignal,
+  selectionScopeRef,
+  onWordRangeChange,
+}: SpeakTextButtonProps) {
   const supported = useMemo(() => supportsSpeechSynthesis(), [])
   const [speaking, setSpeaking] = useState(false)
   const [selectedText, setSelectedText] = useState('')
+
+  const clearHighlight = () => onWordRangeChange?.(null)
 
   useEffect(() => {
     if (!supported) return
     window.speechSynthesis.cancel()
     setSpeaking(false)
     setSelectedText('')
+    clearHighlight()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset on signal only
   }, [resetSignal, supported])
 
   useEffect(() => {
@@ -31,12 +43,15 @@ export function SpeakTextButton({ text, resetSignal, selectionScopeRef }: SpeakT
     const onSettings = () => {
       window.speechSynthesis.cancel()
       setSpeaking(false)
+      clearHighlight()
     }
     window.addEventListener(TTS_SETTINGS_CHANGED_EVENT, onSettings)
     return () => {
       window.removeEventListener(TTS_SETTINGS_CHANGED_EVENT, onSettings)
       window.speechSynthesis.cancel()
+      clearHighlight()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supported])
 
   useEffect(() => {
@@ -71,9 +86,12 @@ export function SpeakTextButton({ text, resetSignal, selectionScopeRef }: SpeakT
 
   const onToggleSpeak = () => {
     const content = selectedText || text
+    const trackWords = !selectedText || selectedText === text.trim()
+
     if (speaking) {
       window.speechSynthesis.cancel()
       setSpeaking(false)
+      clearHighlight()
       return
     }
     const voice = resolveVoiceForPlayback()
@@ -83,9 +101,30 @@ export function SpeakTextButton({ text, resetSignal, selectionScopeRef }: SpeakT
     utterance.lang = voice?.lang ?? 'en-US'
     utterance.rate = speechRate
     utterance.pitch = 1
-    utterance.onend = () => setSpeaking(false)
-    utterance.onerror = () => setSpeaking(false)
+    utterance.onboundary = (event) => {
+      if (!trackWords || event.name !== 'word') return
+      const start = event.charIndex
+      const reported = (event as SpeechSynthesisEvent & { charLength?: number }).charLength
+      const end =
+        typeof reported === 'number' && reported > 0 ? start + reported : speechWordEnd(content, start)
+      // When speaking the full `text`, ranges align with parent highlight mapping.
+      if (content === text) {
+        onWordRangeChange?.({ start, end })
+      } else {
+        // Selection: no page-level mapping — clear rather than mis-highlight.
+        onWordRangeChange?.(null)
+      }
+    }
+    utterance.onend = () => {
+      setSpeaking(false)
+      clearHighlight()
+    }
+    utterance.onerror = () => {
+      setSpeaking(false)
+      clearHighlight()
+    }
     window.speechSynthesis.cancel()
+    clearHighlight()
     window.speechSynthesis.speak(utterance)
     setSpeaking(true)
   }

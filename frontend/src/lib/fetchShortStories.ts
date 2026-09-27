@@ -72,11 +72,37 @@ export async function fetchRandomShortStory(): Promise<ShortStory> {
 }
 
 export function storySpeakText(story: ShortStory): string {
-  const parts = [
-    story.title,
-    `By ${story.author}.`,
-    story.story,
-    story.moral ? `Moral: ${story.moral}` : '',
-  ]
-  return parts.filter(Boolean).join('\n\n')
+  return storySpeakLayout(story).text
+}
+
+/** Same string as TTS, with offsets for word highlighting. */
+export function storySpeakLayout(story: ShortStory): {
+  text: string
+  title: string
+  byline: string
+  story: string
+  moralLine: string
+  offsets: { title: number; byline: number; story: number; moral: number }
+} {
+  const title = story.title
+  const byline = `By ${story.author}.`
+  const body = story.story
+  const moralLine = story.moral ? `Moral: ${story.moral}` : ''
+  const parts = [title, byline, body, moralLine].filter(Boolean)
+  const text = parts.join('\n\n')
+  let cursor = 0
+  const offsets = { title: 0, byline: -1, story: -1, moral: -1 }
+  const place = (part: string, key: keyof typeof offsets) => {
+    if (!part) return
+    const at = text.indexOf(part, cursor)
+    if (at >= 0) {
+      offsets[key] = at
+      cursor = at + part.length
+    }
+  }
+  place(title, 'title')
+  place(byline, 'byline')
+  place(body, 'story')
+  place(moralLine, 'moral')
+  return { text, title, byline, story: body, moralLine, offsets }
 }

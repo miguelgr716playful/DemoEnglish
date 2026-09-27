@@ -2123,6 +2123,17 @@ html[data-theme="dark"] .verbs-tabs button.active {
 .stories-body p:last-child {
   margin-bottom: 0;
 }
+.stories-story-block {
+  white-space: pre-wrap;
+}
+.tts-word-highlight {
+  background: color-mix(in srgb, var(--teal) 55%, transparent);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 0 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
 .stories-moral {
   margin-top: 1.25em !important;
   padding-top: 1em;

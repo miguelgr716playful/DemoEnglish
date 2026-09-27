@@ -15,6 +15,7 @@ import {
   type VocabWord,
 } from '../data/vocabImageWords'
 import { fetchVocabImage, type VocabImageResult } from '../lib/fetchVocabImage'
+import { HighlightedText, localSpeechRange, type SpeechWordRange } from './HighlightedText'
 import { SpeakTextButton } from './SpeakTextButton'
 
 function shuffle<T>(items: T[]): T[] {
@@ -134,8 +135,15 @@ export function VocabularyPracticePage({ onBack }: VocabularyPracticePageProps) 
   const current = deck[index % Math.max(deck.length, 1)] ?? null
   const { data, loading, error } = useVocabImage(current)
   const extractRef = useRef<HTMLParagraphElement | null>(null)
+  const [wordRange, setWordRange] = useState<SpeechWordRange | null>(null)
   const speakText = [current?.word, data?.extract].filter(Boolean).join('. ')
   const speakKey = `${current?.word ?? ''}:${index}:${revealed ? 'on' : 'off'}`
+  const wordLen = current?.word.length ?? 0
+  const extractOffset = data?.extract ? wordLen + 2 : -1
+
+  useEffect(() => {
+    setWordRange(null)
+  }, [speakKey])
 
   const choices = useMemo(() => {
     if (!current || mode !== 'quiz') return []
@@ -234,7 +242,16 @@ export function VocabularyPracticePage({ onBack }: VocabularyPracticePageProps) 
 
           {mode === 'browse' ? (
             <div className="vocab-browse-meta">
-              <h2>{revealed ? current.word : '???'} </h2>
+              <h2>
+                {revealed ? (
+                  <HighlightedText
+                    text={current.word}
+                    range={localSpeechRange(wordRange, 0, wordLen)}
+                  />
+                ) : (
+                  '???'
+                )}
+              </h2>
               {current.hint ? (
                 <p className="vocab-hint">
                   <Lightbulb size={14} aria-hidden /> {current.hint}
@@ -242,7 +259,10 @@ export function VocabularyPracticePage({ onBack }: VocabularyPracticePageProps) 
               ) : null}
               {revealed && data?.extract ? (
                 <p className="vocab-extract" ref={extractRef}>
-                  {data.extract}
+                  <HighlightedText
+                    text={data.extract}
+                    range={localSpeechRange(wordRange, extractOffset, data.extract.length)}
+                  />
                 </p>
               ) : null}
               {revealed ? (
@@ -251,6 +271,7 @@ export function VocabularyPracticePage({ onBack }: VocabularyPracticePageProps) 
                     text={speakText || current.word}
                     resetSignal={speakKey}
                     selectionScopeRef={extractRef}
+                    onWordRangeChange={setWordRange}
                   />
                 </div>
               ) : null}

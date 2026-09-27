@@ -2,6 +2,7 @@ import { ChevronDown, ChevronUp, Volume2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { buildSongSearchLinks } from '../lib/externalSongLinks'
 import { SpeakTextButton } from './SpeakTextButton'
+import { HighlightedText, type SpeechWordRange } from './HighlightedText'
 import type { WordDefinitionDto } from '../types/dictionary'
 
 type DefinitionCardProps = {
@@ -12,12 +13,14 @@ type DefinitionCardProps = {
 export function DefinitionCard({ definition, onAddToAnki }: DefinitionCardProps) {
   const [hidden, setHidden] = useState(false)
   const [added, setAdded] = useState(false)
+  const [wordRange, setWordRange] = useState<SpeechWordRange | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const definitionTextRef = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
     setHidden(false)
     setAdded(false)
+    setWordRange(null)
   }, [definition.word])
 
   const readAloudKey = useMemo(
@@ -98,13 +101,14 @@ export function DefinitionCard({ definition, onAddToAnki }: DefinitionCardProps)
       </div>
 
       <p className="definition" ref={definitionTextRef}>
-        {definition.primaryDefinition}
+        <HighlightedText text={definition.primaryDefinition} range={wordRange} />
       </p>
       <div className="definition-speak">
         <SpeakTextButton
           text={definition.primaryDefinition}
           resetSignal={readAloudKey}
           selectionScopeRef={definitionTextRef}
+          onWordRangeChange={setWordRange}
         />
       </div>
 
