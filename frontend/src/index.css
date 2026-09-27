@@ -2126,8 +2126,16 @@ html[data-theme="dark"] .verbs-tabs button.active {
 .stories-story-block {
   white-space: pre-wrap;
 }
+.tts-line-highlight {
+  background: color-mix(in srgb, var(--teal) 16%, transparent);
+  color: inherit;
+  border-radius: 6px;
+  padding: 0.12em 0;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
 .tts-word-highlight {
-  background: color-mix(in srgb, var(--teal) 55%, transparent);
+  background: color-mix(in srgb, var(--teal) 42%, transparent);
   color: var(--ink);
   border-radius: 4px;
   padding: 0 2px;
