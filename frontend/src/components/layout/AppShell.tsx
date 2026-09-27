@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import {
   BookOpen,
+  Clapperboard,
   Layers,
   Mic,
   Search,
@@ -8,7 +9,7 @@ import {
 } from 'lucide-react'
 import { ThemeSelector } from '../ThemeSelector'
 
-export type AppScreen = 'workspace' | 'deck' | 'interview'
+export type AppScreen = 'workspace' | 'deck' | 'videos' | 'interview'
 
 type AppShellProps = {
   screen: AppScreen
@@ -39,6 +40,7 @@ export function AppShell({
   const nav: { id: AppScreen; label: string; icon: typeof Search }[] = [
     { id: 'workspace', label: 'Workspace', icon: Search },
     { id: 'deck', label: 'Deck', icon: Layers },
+    { id: 'videos', label: 'Videos', icon: Clapperboard },
     { id: 'interview', label: 'Interview', icon: Mic },
   ]
 

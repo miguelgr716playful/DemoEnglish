@@ -13,13 +13,13 @@ import { translateToEnglish } from './api/translatorClient'
 import { AnkiDeckPanel } from './components/AnkiDeckPanel'
 import { AppShell, type AppScreen } from './components/layout/AppShell'
 import { VerbTensePracticeDialog } from './components/VerbTensePracticeDialog'
-import { CuratedEnglishVideosDialog } from './components/CuratedEnglishVideosDialog'
 import { VerbTenseTheoryDialog } from './components/VerbTenseTheoryDialog'
 import { VerbListsDialog } from './components/VerbListsDialog'
 import { DefinitionCard } from './components/DefinitionCard'
 import { SearchBar } from './components/SearchBar'
 import { InterviewPracticeScreen } from './components/InterviewPracticeScreen'
 import { SettingsDialog } from './components/SettingsDialog'
+import { VideosPage } from './components/VideosPage'
 import { DictionaryRequestError, type WordDefinitionDto } from './types/dictionary'
 import type { AnkiCard } from './types/anki'
 
@@ -44,7 +44,7 @@ const TOOLS = [
   { label: 'Verb tenses', caption: 'Quick practice', icon: Sparkles, open: 'verbPractice' as const },
   { label: 'Tense theory', caption: 'Reference', icon: BookOpen, open: 'tenseTheory' as const },
   { label: 'Verb lists', caption: 'Irregular & phrasal', icon: List, open: 'verbLists' as const },
-  { label: 'Curated videos', caption: 'Watch with captions', icon: Clapperboard, open: 'curatedVideos' as const },
+  { label: 'Videos', caption: 'By category', icon: Clapperboard, open: 'videos' as const },
 ]
 
 function App() {
@@ -57,7 +57,6 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [verbPracticeOpen, setVerbPracticeOpen] = useState(false)
   const [tenseTheoryOpen, setTenseTheoryOpen] = useState(false)
-  const [curatedVideosOpen, setCuratedVideosOpen] = useState(false)
   const [verbListsOpen, setVerbListsOpen] = useState(false)
 
   const dateLabel = useMemo(
@@ -119,7 +118,7 @@ function App() {
     if (id === 'verbPractice') setVerbPracticeOpen(true)
     if (id === 'tenseTheory') setTenseTheoryOpen(true)
     if (id === 'verbLists') setVerbListsOpen(true)
-    if (id === 'curatedVideos') setCuratedVideosOpen(true)
+    if (id === 'videos') setScreen('videos')
   }
 
   return (
@@ -274,12 +273,13 @@ function App() {
           </div>
         ) : null}
 
+        {screen === 'videos' ? <VideosPage /> : null}
+
         {screen === 'interview' ? <InterviewPracticeScreen onClose={() => setScreen('workspace')} /> : null}
       </AppShell>
 
       <VerbTensePracticeDialog open={verbPracticeOpen} onClose={() => setVerbPracticeOpen(false)} />
       <VerbTenseTheoryDialog open={tenseTheoryOpen} onClose={() => setTenseTheoryOpen(false)} />
-      <CuratedEnglishVideosDialog open={curatedVideosOpen} onClose={() => setCuratedVideosOpen(false)} />
       <VerbListsDialog open={verbListsOpen} onClose={() => setVerbListsOpen(false)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </>
