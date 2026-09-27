@@ -3,13 +3,14 @@ import {
   BookOpen,
   Clapperboard,
   Layers,
+  ListTree,
   Mic,
   Search,
   Settings,
 } from 'lucide-react'
 import { ThemeSelector } from '../ThemeSelector'
 
-export type AppScreen = 'workspace' | 'deck' | 'videos' | 'interview'
+export type AppScreen = 'workspace' | 'deck' | 'videos' | 'theory' | 'verbs' | 'interview'
 
 type AppShellProps = {
   screen: AppScreen
@@ -40,6 +41,8 @@ export function AppShell({
   const nav: { id: AppScreen; label: string; icon: typeof Search }[] = [
     { id: 'workspace', label: 'Workspace', icon: Search },
     { id: 'deck', label: 'Deck', icon: Layers },
+    { id: 'theory', label: 'Theory', icon: BookOpen },
+    { id: 'verbs', label: 'Verbs', icon: ListTree },
     { id: 'videos', label: 'Videos', icon: Clapperboard },
     { id: 'interview', label: 'Interview', icon: Mic },
   ]

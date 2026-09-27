@@ -13,13 +13,13 @@ import { translateToEnglish } from './api/translatorClient'
 import { AnkiDeckPanel } from './components/AnkiDeckPanel'
 import { AppShell, type AppScreen } from './components/layout/AppShell'
 import { VerbTensePracticeDialog } from './components/VerbTensePracticeDialog'
-import { VerbTenseTheoryDialog } from './components/VerbTenseTheoryDialog'
-import { VerbListsDialog } from './components/VerbListsDialog'
 import { DefinitionCard } from './components/DefinitionCard'
 import { SearchBar } from './components/SearchBar'
 import { InterviewPracticeScreen } from './components/InterviewPracticeScreen'
 import { SettingsDialog } from './components/SettingsDialog'
 import { VideosPage } from './components/VideosPage'
+import { TenseTheoryPage } from './components/TenseTheoryPage'
+import { VerbListsPage } from './components/VerbListsPage'
 import { YoutubePlayerProvider } from './components/YoutubeFloatingPlayer'
 import { DictionaryRequestError, type WordDefinitionDto } from './types/dictionary'
 import type { AnkiCard } from './types/anki'
@@ -44,7 +44,7 @@ function hasSpanishIndicators(text: string): boolean {
 const TOOLS = [
   { label: 'Verb tenses', caption: 'Quick practice', icon: Sparkles, open: 'verbPractice' as const },
   { label: 'Tense theory', caption: 'Reference', icon: BookOpen, open: 'tenseTheory' as const },
-  { label: 'Verb lists', caption: 'Irregular & phrasal', icon: List, open: 'verbLists' as const },
+  { label: 'Verb lists', caption: 'Irregular & forms', icon: List, open: 'verbLists' as const },
   { label: 'Videos', caption: 'By category', icon: Clapperboard, open: 'videos' as const },
 ]
 
@@ -57,8 +57,6 @@ function App() {
   const [ankiCards, setAnkiCards] = useState<AnkiCard[]>([])
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [verbPracticeOpen, setVerbPracticeOpen] = useState(false)
-  const [tenseTheoryOpen, setTenseTheoryOpen] = useState(false)
-  const [verbListsOpen, setVerbListsOpen] = useState(false)
 
   const dateLabel = useMemo(
     () =>
@@ -115,10 +113,14 @@ function App() {
     ])
   }, [])
 
+  const addCardsToDeck = useCallback((cards: AnkiCard[]) => {
+    setAnkiCards((prev) => [...prev, ...cards])
+  }, [])
+
   const openTool = (id: (typeof TOOLS)[number]['open']) => {
     if (id === 'verbPractice') setVerbPracticeOpen(true)
-    if (id === 'tenseTheory') setTenseTheoryOpen(true)
-    if (id === 'verbLists') setVerbListsOpen(true)
+    if (id === 'tenseTheory') setScreen('theory')
+    if (id === 'verbLists') setScreen('verbs')
     if (id === 'videos') setScreen('videos')
   }
 
@@ -276,12 +278,14 @@ function App() {
 
         {screen === 'videos' ? <VideosPage /> : null}
 
+        {screen === 'theory' ? <TenseTheoryPage /> : null}
+
+        {screen === 'verbs' ? <VerbListsPage onAddToDeck={addCardsToDeck} /> : null}
+
         {screen === 'interview' ? <InterviewPracticeScreen onClose={() => setScreen('workspace')} /> : null}
       </AppShell>
 
       <VerbTensePracticeDialog open={verbPracticeOpen} onClose={() => setVerbPracticeOpen(false)} />
-      <VerbTenseTheoryDialog open={tenseTheoryOpen} onClose={() => setTenseTheoryOpen(false)} />
-      <VerbListsDialog open={verbListsOpen} onClose={() => setVerbListsOpen(false)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </YoutubePlayerProvider>
   )
