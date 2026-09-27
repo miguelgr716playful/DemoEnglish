@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft,
   Check,
@@ -15,6 +15,7 @@ import {
   type VocabWord,
 } from '../data/vocabImageWords'
 import { fetchVocabImage, type VocabImageResult } from '../lib/fetchVocabImage'
+import { SpeakTextButton } from './SpeakTextButton'
 
 function shuffle<T>(items: T[]): T[] {
   const a = [...items]
@@ -132,6 +133,9 @@ export function VocabularyPracticePage({ onBack }: VocabularyPracticePageProps) 
 
   const current = deck[index % Math.max(deck.length, 1)] ?? null
   const { data, loading, error } = useVocabImage(current)
+  const extractRef = useRef<HTMLParagraphElement | null>(null)
+  const speakText = [current?.word, data?.extract].filter(Boolean).join('. ')
+  const speakKey = `${current?.word ?? ''}:${index}:${revealed ? 'on' : 'off'}`
 
   const choices = useMemo(() => {
     if (!current || mode !== 'quiz') return []
@@ -236,7 +240,20 @@ export function VocabularyPracticePage({ onBack }: VocabularyPracticePageProps) 
                   <Lightbulb size={14} aria-hidden /> {current.hint}
                 </p>
               ) : null}
-              {revealed && data?.extract ? <p className="vocab-extract">{data.extract}</p> : null}
+              {revealed && data?.extract ? (
+                <p className="vocab-extract" ref={extractRef}>
+                  {data.extract}
+                </p>
+              ) : null}
+              {revealed ? (
+                <div className="vocab-speak">
+                  <SpeakTextButton
+                    text={speakText || current.word}
+                    resetSignal={speakKey}
+                    selectionScopeRef={extractRef}
+                  />
+                </div>
+              ) : null}
               <div className="vocab-actions">
                 {!revealed ? (
                   <button type="button" className="button button-primary" onClick={() => setRevealed(true)}>

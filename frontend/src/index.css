@@ -1933,6 +1933,11 @@ html[data-theme="dark"] .verbs-tabs button.active {
   max-height: 22em;
   overflow: auto;
 }
+.vocab-speak {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .vocab-actions {
   display: flex;
   flex-wrap: wrap;
