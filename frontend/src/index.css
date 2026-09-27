@@ -1926,11 +1926,11 @@ html[data-theme="dark"] .verbs-tabs button.active {
 }
 .vocab-extract {
   margin: 0;
-  color: var(--ink-soft);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.5;
-  max-height: 7.5em;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.65;
+  max-height: 22em;
   overflow: auto;
 }
 .vocab-actions {
