@@ -48,7 +48,7 @@ type MarkdownFormulaProps = {
 export function MarkdownFormula({ text }: MarkdownFormulaProps) {
   const lines = text.split('\n')
   return (
-    <div className="font-mono text-[0.8rem] leading-relaxed text-slate-700 dark:text-slate-300">
+    <div className="font-mono text-[0.95rem] font-semibold leading-relaxed text-slate-800 dark:text-slate-100">
       {lines.map((line, li) => (
         <div key={`ln-${li}`}>
           {parseRichLine(line, `f-${li}`)}

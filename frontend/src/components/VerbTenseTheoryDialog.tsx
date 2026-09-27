@@ -105,7 +105,7 @@ export function VerbTenseTheoryDialog({ open, onClose }: VerbTenseTheoryDialogPr
               >
                 Tense formulas
               </h2>
-              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Quick reference — not exhaustive.</p>
+              <p className="mt-0.5 text-sm font-semibold text-slate-400">Quick reference — not exhaustive.</p>
             </div>
           </div>
           <button
@@ -129,12 +129,13 @@ export function VerbTenseTheoryDialog({ open, onClose }: VerbTenseTheoryDialogPr
                 <div className="mt-2">
                   <MarkdownFormula text={b.formula} />
                 </div>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                  <span className="font-medium text-slate-700 dark:text-slate-300">Use:</span>{' '}
+                <p className="mt-2 text-base font-semibold leading-relaxed text-slate-600 dark:text-slate-300">
+                  <span className="font-bold text-slate-900 dark:text-slate-100">Use:</span>{' '}
                   <MarkdownLite text={b.usage} />
                 </p>
-                <p className="mt-1.5 text-sm text-slate-700 dark:text-slate-300">
-                  <span className="font-medium">e.g.</span> <MarkdownLite text={b.example} />
+                <p className="mt-2 text-base font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
+                  <span className="font-bold text-slate-900 dark:text-slate-100">e.g.</span>{' '}
+                  <MarkdownLite text={b.example} />
                 </p>
                 <TenseTheoryYoutubeDetails video={b.youtube} className="mt-3" />
               </li>
