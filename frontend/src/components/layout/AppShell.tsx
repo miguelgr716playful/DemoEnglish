@@ -2,12 +2,11 @@ import type { ReactNode } from 'react'
 import {
   BookOpen,
   Clapperboard,
-  CloudSun,
   Clock3,
   Layers,
+  LayoutGrid,
   ListTree,
   Mic,
-  Palmtree,
   Search,
   Settings,
 } from 'lucide-react'
@@ -20,8 +19,7 @@ export type AppScreen =
   | 'theory'
   | 'tenses'
   | 'verbs'
-  | 'weather'
-  | 'vacations'
+  | 'topics'
   | 'interview'
 
 type AppShellProps = {
@@ -56,8 +54,7 @@ export function AppShell({
     { id: 'theory', label: 'Theory', icon: BookOpen },
     { id: 'tenses', label: 'Tenses', icon: Clock3 },
     { id: 'verbs', label: 'Verbs', icon: ListTree },
-    { id: 'weather', label: 'Weather', icon: CloudSun },
-    { id: 'vacations', label: 'Vacations', icon: Palmtree },
+    { id: 'topics', label: 'Topics', icon: LayoutGrid },
     { id: 'videos', label: 'Videos', icon: Clapperboard },
     { id: 'interview', label: 'Interview', icon: Mic },
   ]

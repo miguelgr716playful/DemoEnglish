@@ -21,8 +21,7 @@ import { VideosPage } from './components/VideosPage'
 import { TenseTheoryPage } from './components/TenseTheoryPage'
 import { TensesPage } from './components/TensesPage'
 import { VerbListsPage } from './components/VerbListsPage'
-import { WeatherPage } from './components/WeatherPage'
-import { VacationsPage } from './components/VacationsPage'
+import { TopicsFlow } from './components/TopicsFlow'
 import { YoutubePlayerProvider } from './components/YoutubeFloatingPlayer'
 import { DictionaryRequestError, type WordDefinitionDto } from './types/dictionary'
 import type { AnkiCard } from './types/anki'
@@ -287,9 +286,7 @@ function App() {
 
         {screen === 'verbs' ? <VerbListsPage onAddToDeck={addCardsToDeck} /> : null}
 
-        {screen === 'weather' ? <WeatherPage /> : null}
-
-        {screen === 'vacations' ? <VacationsPage /> : null}
+        {screen === 'topics' ? <TopicsFlow /> : null}
 
         {screen === 'interview' ? <InterviewPracticeScreen onClose={() => setScreen('workspace')} /> : null}
       </AppShell>
