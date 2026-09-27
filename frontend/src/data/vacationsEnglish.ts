@@ -7,6 +7,8 @@ export const vacationTables: TopicTable[] = [
     id: 'trip-types',
     title: 'Types of trips',
     note: 'vacation (US) · holiday (UK) for time off.',
+    image: '/topics/vacation-trip.png',
+    imageAlt: 'Coastal road trip at sunset',
     headers: ['Word', 'Meaning', 'Example'],
     rows: [
       ['vacation / holiday', 'time off work/school', "I'm on vacation next week."],
@@ -70,6 +72,8 @@ export const vacationTables: TopicTable[] = [
     id: 'airport',
     title: 'At the airport',
     note: 'Security & boarding.',
+    image: '/topics/vacation-airport.png',
+    imageAlt: 'Airport terminal with suitcase',
     headers: ['Word', 'Meaning'],
     rows: [
       ['security check', 'bags / body scan'],
@@ -89,6 +93,8 @@ export const vacationTables: TopicTable[] = [
     id: 'time-off',
     title: 'Time off work',
     note: 'Office English for vacations.',
+    image: '/topics/vacation-pto.png',
+    imageAlt: 'Desk closed for time off',
     headers: ['Phrase', 'Meaning'],
     rows: [
       ['take time off', 'not work for a period'],
@@ -106,6 +112,8 @@ export const vacationTables: TopicTable[] = [
     id: 'money-travel',
     title: 'Money on the road',
     note: 'Payments & tips.',
+    image: '/topics/vacation-money.png',
+    imageAlt: 'Travel money on a cafe table',
     headers: ['Word', 'Example'],
     rows: [
       ['currency / exchange rate', "What's the exchange rate?"],

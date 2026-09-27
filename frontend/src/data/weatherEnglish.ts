@@ -47,6 +47,8 @@ export const weatherTables: TopicTable[] = [
     id: 'temperature',
     title: 'Temperature talk',
     note: 'Degrees · feel vs thermometer.',
+    image: '/topics/weather-temp.png',
+    imageAlt: 'Thermometer in cold morning light',
     headers: ['Phrase', 'Use', 'Example'],
     rows: [
       ["It's boiling / scorching", 'very hot (informal)', "It's boiling outside."],
@@ -87,6 +89,8 @@ export const weatherTables: TopicTable[] = [
     id: 'verbs-weather',
     title: 'Weather verbs',
     note: 'It rains · The sun is shining.',
+    image: '/topics/weather-verbs.png',
+    imageAlt: 'Rain and wind against a window',
     headers: ['Pattern', 'Example'],
     rows: [
       ['It + weather verb', "It rains a lot in autumn. / It's raining now."],
@@ -103,6 +107,8 @@ export const weatherTables: TopicTable[] = [
     id: 'clothes-weather',
     title: 'Clothes & gear',
     note: 'What to wear / bring.',
+    image: '/topics/weather-clothes.png',
+    imageAlt: 'Raincoat umbrella and boots',
     headers: ['Item', 'When'],
     rows: [
       ['umbrella / brolly (UK)', 'rain'],

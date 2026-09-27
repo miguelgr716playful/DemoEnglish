@@ -60,6 +60,11 @@ function TheoryVideoChip({ video }: { video: TenseTheoryYoutube & { label?: stri
 function TheoryRefTableCard({ table }: { table: TheoryRefTable }) {
   return (
     <section className="theory-card theory-ref-card" id={`theory-ref-${table.id}`}>
+      {table.image ? (
+        <div className="topic-card-media">
+          <img src={table.image} alt={table.imageAlt ?? ''} loading="lazy" decoding="async" />
+        </div>
+      ) : null}
       <h3>{table.title}</h3>
       {table.note ? <p className="theory-ref-note">{table.note}</p> : null}
       <div className="theory-ref-wrap">
@@ -151,6 +156,15 @@ export function TenseTheoryPage() {
           <GraduationCap size={28} strokeWidth={1.8} />
         </div>
       </section>
+
+      <figure className="topic-hero-media">
+        <img
+          src="/topics/theory-hero.png"
+          alt="Study desk with notebook and warm lamp"
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
 
       <label className="theory-search">
         <Search size={18} strokeWidth={1.8} aria-hidden />

@@ -10,6 +10,8 @@ export type TheoryRefTable = {
   rows: TheoryTableRow[]
   /** Extra keywords so search finds the table. */
   tags: string[]
+  image?: string
+  imageAlt?: string
 }
 
 export const theoryReferenceTables: TheoryRefTable[] = [
@@ -17,6 +19,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'subjects',
     title: 'Subject pronouns',
     note: 'Who does the action — go before the verb.',
+    image: '/topics/theory-pronouns.png',
+    imageAlt: 'People conversing illustration',
     headers: ['Person', 'Singular', 'Plural'],
     rows: [
       ['1st', 'I', 'we'],
@@ -29,6 +33,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'objects',
     title: 'Object pronouns',
     note: 'Receive the action — after the verb or preposition.',
+    image: '/topics/theory-pronouns.png',
+    imageAlt: 'People conversing illustration',
     headers: ['Subject', 'Object', 'Example'],
     rows: [
       ['I', 'me', 'Call me after the deploy.'],
@@ -45,6 +51,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'possessives',
     title: 'Possessives',
     note: 'Adjective before a noun · pronoun stands alone.',
+    image: '/topics/theory-pronouns.png',
+    imageAlt: 'People conversing illustration',
     headers: ['Subject', 'Adjective', 'Pronoun'],
     rows: [
       ['I', 'my', 'mine'],
@@ -61,6 +69,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'be',
     title: 'Be — present & past',
     note: 'am / is / are · was / were',
+    image: '/topics/theory-helpers.png',
+    imageAlt: 'Grammar helper blocks',
     headers: ['Subject', 'Present', 'Past', 'Negative (present)'],
     rows: [
       ['I', 'am', 'was', "I'm not / am not"],
@@ -73,6 +83,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'do-have',
     title: 'Do & have (helpers)',
     note: 'Questions / negatives · possession or perfect tenses.',
+    image: '/topics/theory-helpers.png',
+    imageAlt: 'Grammar helper blocks',
     headers: ['Subject', 'do / does', 'have / has'],
     rows: [
       ['I / you / we / they', 'do', 'have'],
@@ -84,6 +96,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'wh-words',
     title: 'Question words',
     note: 'Wh- + auxiliary + subject + verb…',
+    image: '/topics/theory-questions.png',
+    imageAlt: 'Clock and calendar illustration',
     headers: ['Word', 'Asks about', 'Example'],
     rows: [
       ['Who', 'person (subject)', 'Who owns this repo?'],
@@ -102,6 +116,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'time-markers',
     title: 'Time markers (tense hints)',
     note: 'Common signals — not strict rules.',
+    image: '/topics/theory-questions.png',
+    imageAlt: 'Clock and calendar illustration',
     headers: ['Often with…', 'Markers'],
     rows: [
       ['Present simple', 'usually, always, every day, on Mondays'],
@@ -118,6 +134,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'reflexives',
     title: 'Reflexive pronouns',
     note: 'Same person as subject — myself, yourself…',
+    image: '/topics/theory-pronouns.png',
+    imageAlt: 'People conversing illustration',
     headers: ['Subject', 'Reflexive', 'Example'],
     rows: [
       ['I', 'myself', 'I restarted the service myself.'],
@@ -134,6 +152,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'demonstratives',
     title: 'Demonstratives',
     note: 'Near / far · singular / plural.',
+    image: '/topics/theory-pronouns.png',
+    imageAlt: 'People conversing illustration',
     headers: ['', 'Near', 'Far'],
     rows: [
       ['Singular', 'this', 'that'],
@@ -145,6 +165,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'articles',
     title: 'Articles',
     note: 'a / an = one of many · the = specific / known.',
+    image: '/topics/theory-helpers.png',
+    imageAlt: 'Grammar helper blocks',
     headers: ['Form', 'Use', 'Example'],
     rows: [
       ['a', 'consonant sound', 'a repo, a unique ID'],
@@ -158,6 +180,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'there-is',
     title: 'There is / there are',
     note: 'Existence — not “hay” word-for-word calques.',
+    image: '/topics/theory-helpers.png',
+    imageAlt: 'Grammar helper blocks',
     headers: ['', 'Affirmative', 'Negative', 'Question'],
     rows: [
       ['Singular', 'there is', "there isn't", 'is there…?'],
@@ -170,6 +194,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'frequency',
     title: 'Frequency adverbs',
     note: 'Usually before the main verb · after be.',
+    image: '/topics/theory-questions.png',
+    imageAlt: 'Clock and calendar illustration',
     headers: ['Adverb', '~%', 'Position tip'],
     rows: [
       ['always', '100%', 'We always run tests.'],
@@ -185,6 +211,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'quantifiers',
     title: 'Quantifiers',
     note: 'much / little → uncountable · many / few → countable.',
+    image: '/topics/theory-helpers.png',
+    imageAlt: 'Grammar helper blocks',
     headers: ['With…', 'Large', 'Small', 'Questions / neg.'],
     rows: [
       ['Countable', 'many / a lot of', 'few / a few', 'any / some'],
@@ -197,6 +225,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'prep-time',
     title: 'Prepositions of time',
     note: 'in / on / at — classic traps.',
+    image: '/topics/theory-questions.png',
+    imageAlt: 'Clock and calendar illustration',
     headers: ['Prep', 'Use with', 'Examples'],
     rows: [
       ['in', 'months, years, parts of day, long periods', 'in May, in 2024, in the morning, in an hour'],
@@ -213,6 +243,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'prep-place',
     title: 'Prepositions of place',
     note: 'Where something is / moves.',
+    image: '/topics/theory-questions.png',
+    imageAlt: 'Clock and calendar illustration',
     headers: ['Prep', 'Idea', 'Examples'],
     rows: [
       ['in', 'inside / area', 'in the VPC, in the backlog'],
@@ -229,6 +261,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'comparatives',
     title: 'Comparatives & superlatives',
     note: 'Compare two · extreme of a group.',
+    image: '/topics/theory-maps.png',
+    imageAlt: 'Grammar map illustration',
     headers: ['Type', 'Comparative', 'Superlative'],
     rows: [
       ['Short adj.', 'faster, bigger, safer', 'the fastest, biggest, safest'],
@@ -243,6 +277,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'modals-quick',
     title: 'Modals — quick map',
     note: 'Modal + base verb (no -s, no to*).',
+    image: '/topics/theory-maps.png',
+    imageAlt: 'Grammar map illustration',
     headers: ['Modal', 'Main use', 'Example'],
     rows: [
       ['can / could', 'ability / possibility / polite ask', 'Can you reproduce it?'],
@@ -260,6 +296,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'connectors',
     title: 'Linking words',
     note: 'Join ideas in writing and standups.',
+    image: '/topics/theory-maps.png',
+    imageAlt: 'Grammar map illustration',
     headers: ['Purpose', 'Connectors'],
     rows: [
       ['Add', 'and, also, plus, in addition, furthermore'],
@@ -276,6 +314,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'countable',
     title: 'Countable vs uncountable',
     note: 'Affects a/an, many/much, plural -s.',
+    image: '/topics/theory-helpers.png',
+    imageAlt: 'Grammar helper blocks',
     headers: ['Countable', 'Uncountable (common)'],
     rows: [
       ['ticket, bug, server, repo', 'traffic, latency, advice, information'],
@@ -290,6 +330,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'imperatives',
     title: 'Imperatives',
     note: 'Commands / instructions — base verb, no subject.',
+    image: '/topics/theory-maps.png',
+    imageAlt: 'Grammar map illustration',
     headers: ['Form', 'Example'],
     rows: [
       ['Affirmative', 'Restart the pod. Check the logs.'],
@@ -303,6 +345,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'conditionals-map',
     title: 'Conditionals — at a glance',
     note: 'If-clause · result clause.',
+    image: '/topics/theory-maps.png',
+    imageAlt: 'Grammar map illustration',
     headers: ['Type', 'If-clause', 'Result'],
     rows: [
       ['Zero', 'present', 'present (facts)'],
@@ -317,6 +361,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'passive-map',
     title: 'Passive — be + participle',
     note: 'Focus on the object / result.',
+    image: '/topics/theory-maps.png',
+    imageAlt: 'Grammar map illustration',
     headers: ['Tense', 'Form', 'Example'],
     rows: [
       ['Present simple', 'am/is/are + PP', 'The API is rate-limited.'],
@@ -332,6 +378,8 @@ export const theoryReferenceTables: TheoryRefTable[] = [
     id: 'reported',
     title: 'Reported speech (shifts)',
     note: 'Often shift tense one step back when reporting.',
+    image: '/topics/theory-maps.png',
+    imageAlt: 'Grammar map illustration',
     headers: ['Direct', 'Reported (often)'],
     rows: [
       ['present →', 'past'],
