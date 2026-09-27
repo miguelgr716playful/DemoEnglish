@@ -26,6 +26,8 @@ export const vacationTables: TopicTable[] = [
     id: 'booking',
     title: 'Booking & travel docs',
     note: 'Airports, hotels, tickets.',
+    image: '/topics/vacation-flight.png',
+    imageAlt: 'Airplane window illustration',
     headers: ['Word', 'Meaning'],
     rows: [
       ['book / reserve', 'arrange in advance'],
@@ -47,6 +49,8 @@ export const vacationTables: TopicTable[] = [
     id: 'hotel',
     title: 'At the hotel',
     note: 'Reception language.',
+    image: '/topics/vacation-hotel.png',
+    imageAlt: 'Hotel lobby illustration',
     headers: ['Phrase / word', 'Use'],
     rows: [
       ['single / double / twin', 'bed types'],

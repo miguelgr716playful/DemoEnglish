@@ -7,6 +7,9 @@ export type TopicTable = {
   headers: string[]
   rows: string[][]
   tags: string[]
+  /** Optional illustration under /public (e.g. /topics/weather-sunny.png). */
+  image?: string
+  imageAlt?: string
 }
 
 export type TopicPhrase = {
@@ -21,6 +24,8 @@ export const weatherTables: TopicTable[] = [
     id: 'conditions',
     title: 'Weather conditions',
     note: 'It’s + adjective / noun · What’s the weather like?',
+    image: '/topics/weather-sunny.png',
+    imageAlt: 'Sunny weather illustration',
     headers: ['Word', 'Meaning', 'Example'],
     rows: [
       ['sunny', 'bright sun', "It's sunny — great for a walk."],
@@ -59,6 +64,8 @@ export const weatherTables: TopicTable[] = [
     id: 'forecast',
     title: 'Forecast words',
     note: 'News / apps language.',
+    image: '/topics/weather-rain.png',
+    imageAlt: 'Rainy weather illustration',
     headers: ['Word', 'Meaning'],
     rows: [
       ['forecast', 'prediction of weather'],

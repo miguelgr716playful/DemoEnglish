@@ -12,6 +12,8 @@ export function VacationsPage() {
       tables={vacationTables}
       phrases={vacationPhrases}
       searchPlaceholder="Search travel (e.g. hotel, flight, PTO, passport…)"
+      heroImage="/topics/vacations-hero.png"
+      heroImageAlt="Travel suitcase on a sunlit terrace overlooking the coast"
     />
   )
 }

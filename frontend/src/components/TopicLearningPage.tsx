@@ -72,6 +72,8 @@ type TopicLearningPageProps = {
   tables: TopicTable[]
   phrases: TopicPhrase[]
   searchPlaceholder: string
+  heroImage?: string
+  heroImageAlt?: string
   extra?: ReactNode
 }
 
@@ -83,6 +85,8 @@ export function TopicLearningPage({
   tables,
   phrases,
   searchPlaceholder,
+  heroImage,
+  heroImageAlt = '',
   extra,
 }: TopicLearningPageProps) {
   const [query, setQuery] = useState('')
@@ -122,6 +126,12 @@ export function TopicLearningPage({
         </div>
       </section>
 
+      {heroImage ? (
+        <figure className="topic-hero-media">
+          <img src={heroImage} alt={heroImageAlt} loading="eager" decoding="async" />
+        </figure>
+      ) : null}
+
       <label className="topic-search">
         <Search size={18} strokeWidth={1.8} aria-hidden />
         <input
@@ -145,6 +155,11 @@ export function TopicLearningPage({
               <div className="theory-ref-grid">
                 {visibleTables.map((table) => (
                   <section key={table.id} className="theory-card theory-ref-card">
+                    {table.image ? (
+                      <div className="topic-card-media">
+                        <img src={table.image} alt={table.imageAlt ?? ''} loading="lazy" decoding="async" />
+                      </div>
+                    ) : null}
                     <h3>{table.title}</h3>
                     {table.note ? <p className="theory-ref-note">{table.note}</p> : null}
                     <div className="theory-ref-wrap">

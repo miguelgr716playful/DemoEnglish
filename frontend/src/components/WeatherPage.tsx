@@ -12,6 +12,8 @@ export function WeatherPage() {
       tables={weatherTables}
       phrases={weatherPhrases}
       searchPlaceholder="Search weather (e.g. rainy, forecast, umbrella…)"
+      heroImage="/topics/weather-hero.png"
+      heroImageAlt="Sky with sun, clouds, and light rain over a city skyline"
     />
   )
 }

@@ -1377,6 +1377,35 @@ html[data-theme="dark"] .verbs-tabs button.active {
   color: var(--teal);
   flex-shrink: 0;
 }
+.topic-hero-media {
+  margin: 0 0 22px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #020617;
+  aspect-ratio: 16 / 9;
+  max-height: 320px;
+}
+.topic-hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.topic-card-media {
+  margin: -4px 0 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  aspect-ratio: 16 / 10;
+  background: #020617;
+}
+.topic-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .topic-search {
   display: flex;
   align-items: center;
