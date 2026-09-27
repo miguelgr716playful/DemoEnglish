@@ -2,15 +2,25 @@ import type { ReactNode } from 'react'
 import {
   BookOpen,
   Clapperboard,
+  CloudSun,
   Layers,
   ListTree,
   Mic,
+  Palmtree,
   Search,
   Settings,
 } from 'lucide-react'
 import { ThemeSelector } from '../ThemeSelector'
 
-export type AppScreen = 'workspace' | 'deck' | 'videos' | 'theory' | 'verbs' | 'interview'
+export type AppScreen =
+  | 'workspace'
+  | 'deck'
+  | 'videos'
+  | 'theory'
+  | 'verbs'
+  | 'weather'
+  | 'vacations'
+  | 'interview'
 
 type AppShellProps = {
   screen: AppScreen
@@ -43,6 +53,8 @@ export function AppShell({
     { id: 'deck', label: 'Deck', icon: Layers },
     { id: 'theory', label: 'Theory', icon: BookOpen },
     { id: 'verbs', label: 'Verbs', icon: ListTree },
+    { id: 'weather', label: 'Weather', icon: CloudSun },
+    { id: 'vacations', label: 'Vacations', icon: Palmtree },
     { id: 'videos', label: 'Videos', icon: Clapperboard },
     { id: 'interview', label: 'Interview', icon: Mic },
   ]

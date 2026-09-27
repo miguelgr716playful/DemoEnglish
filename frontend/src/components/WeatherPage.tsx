@@ -1,0 +1,17 @@
+import { CloudSun } from 'lucide-react'
+import { weatherPhrases, weatherTables } from '../data/weatherEnglish'
+import { TopicLearningPage } from './TopicLearningPage'
+
+export function WeatherPage() {
+  return (
+    <TopicLearningPage
+      eyebrow="EVERYDAY ENGLISH"
+      title="Weather"
+      subtitle="Small talk, forecasts, and what to say when it’s boiling, pouring, or freezing."
+      Icon={CloudSun}
+      tables={weatherTables}
+      phrases={weatherPhrases}
+      searchPlaceholder="Search weather (e.g. rainy, forecast, umbrella…)"
+    />
+  )
+}
