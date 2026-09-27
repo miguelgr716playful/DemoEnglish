@@ -22,6 +22,7 @@ import { TenseTheoryPage } from './components/TenseTheoryPage'
 import { TensesPage } from './components/TensesPage'
 import { VerbListsPage } from './components/VerbListsPage'
 import { TopicsFlow } from './components/TopicsFlow'
+import { StoriesPage } from './components/StoriesPage'
 import { YoutubePlayerProvider } from './components/YoutubeFloatingPlayer'
 import { DictionaryRequestError, type WordDefinitionDto } from './types/dictionary'
 import type { AnkiCard } from './types/anki'
@@ -287,6 +288,8 @@ function App() {
         {screen === 'verbs' ? <VerbListsPage onAddToDeck={addCardsToDeck} /> : null}
 
         {screen === 'topics' ? <TopicsFlow /> : null}
+
+        {screen === 'stories' ? <StoriesPage /> : null}
 
         {screen === 'interview' ? <InterviewPracticeScreen onClose={() => setScreen('workspace')} /> : null}
       </AppShell>
