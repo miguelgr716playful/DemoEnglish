@@ -83,16 +83,6 @@ export function AppShell({
           })}
         </nav>
         <div className="rail-bottom">
-          <div className="daily">
-            <span className="daily-kicker">YOUR DECK</span>
-            <strong>
-              {deckCount === 0 ? 'No cards yet' : `${deckCount} card${deckCount === 1 ? '' : 's'}`}
-            </strong>
-            <div className="progress">
-              <span style={{ width: deckCount === 0 ? '0%' : '68%' }} />
-            </div>
-            <small>{deckCount === 0 ? 'Import or look up a word' : 'Open Deck to study'}</small>
-          </div>
           <ThemeSelector compact />
           <button type="button" className="nav-item" onClick={onOpenSettings}>
             <Settings size={20} strokeWidth={1.8} aria-hidden />

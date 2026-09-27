@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import { ArrowLeft, LayoutGrid } from 'lucide-react'
+import { ArrowLeft, Images, LayoutGrid } from 'lucide-react'
 import { getTopic, topicCatalog, type TopicId } from '../data/topicsCatalog'
 import { TopicLearningPage } from './TopicLearningPage'
+import { VocabularyPracticePage } from './VocabularyPracticePage'
 
-function TopicsHub({ onSelect }: { onSelect: (id: TopicId) => void }) {
+type HubSelection = TopicId | 'vocabulary'
+
+function TopicsHub({ onSelect }: { onSelect: (id: HubSelection) => void }) {
   return (
     <div className="topics-page page">
       <header className="page-topbar">
         <span className="eyebrow">EVERYDAY ENGLISH</span>
-        <span className="date-label">{topicCatalog.length} topics</span>
+        <span className="date-label">{topicCatalog.length + 1} topics</span>
       </header>
 
       <section className="topic-hero">
@@ -16,7 +19,7 @@ function TopicsHub({ onSelect }: { onSelect: (id: TopicId) => void }) {
           <h1>
             Topics<span className="accent-dot">.</span>
           </h1>
-          <p>Weather, travel, food, and more — pick a theme to study vocabulary and phrases.</p>
+          <p>Weather, travel, food, image vocabulary practice, and more.</p>
         </div>
         <div className="topic-hero-icon" aria-hidden>
           <LayoutGrid size={28} strokeWidth={1.8} />
@@ -24,6 +27,17 @@ function TopicsHub({ onSelect }: { onSelect: (id: TopicId) => void }) {
       </section>
 
       <ul className="topics-list">
+        <li>
+          <button type="button" className="topics-list-item" onClick={() => onSelect('vocabulary')}>
+            <span className="topics-list-icon" aria-hidden>
+              <Images size={22} strokeWidth={1.7} />
+            </span>
+            <span className="topics-list-text">
+              <strong>Vocabulary</strong>
+              <small>Public photos + study &amp; quiz practice</small>
+            </span>
+          </button>
+        </li>
         {topicCatalog.map((topic) => {
           const Icon = topic.Icon
           return (
@@ -46,11 +60,19 @@ function TopicsHub({ onSelect }: { onSelect: (id: TopicId) => void }) {
 }
 
 export function TopicsFlow() {
-  const [topicId, setTopicId] = useState<TopicId | null>(null)
-  const topic = topicId ? getTopic(topicId) : null
+  const [selection, setSelection] = useState<HubSelection | null>(null)
 
+  if (!selection) {
+    return <TopicsHub onSelect={setSelection} />
+  }
+
+  if (selection === 'vocabulary') {
+    return <VocabularyPracticePage onBack={() => setSelection(null)} />
+  }
+
+  const topic = getTopic(selection)
   if (!topic) {
-    return <TopicsHub onSelect={setTopicId} />
+    return <TopicsHub onSelect={setSelection} />
   }
 
   const Icon = topic.Icon
@@ -58,7 +80,7 @@ export function TopicsFlow() {
   return (
     <div className="topics-detail">
       <div className="topics-back-bar page">
-        <button type="button" className="topics-back" onClick={() => setTopicId(null)}>
+        <button type="button" className="topics-back" onClick={() => setSelection(null)}>
           <ArrowLeft size={16} strokeWidth={2} aria-hidden />
           Topics
         </button>
