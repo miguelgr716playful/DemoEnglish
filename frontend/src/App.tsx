@@ -280,7 +280,7 @@ function App() {
 
         {screen === 'videos' ? <VideosPage /> : null}
 
-        {screen === 'theory' ? <TenseTheoryPage /> : null}
+        {screen === 'theory' ? <TenseTheoryPage onOpenVideos={() => setScreen('videos')} /> : null}
 
         {screen === 'verbs' ? <VerbListsPage onAddToDeck={addCardsToDeck} /> : null}
 

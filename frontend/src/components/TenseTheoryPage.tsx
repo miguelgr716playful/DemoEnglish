@@ -1,19 +1,12 @@
 import { useMemo, useState } from 'react'
-import { GraduationCap, Play, Search } from 'lucide-react'
+import { Clapperboard, GraduationCap, Search } from 'lucide-react'
 import { MarkdownFormula, MarkdownLite } from './MarkdownLite'
-import {
-  verbTenseTheoryBlocks,
-  verbTenseTheoryExtra,
-  verbTenseTheoryFeaturedVideo,
-  type TenseTheoryYoutube,
-} from '../data/verbTenseTheory'
+import { verbTenseTheoryBlocks, verbTenseTheoryExtra } from '../data/verbTenseTheory'
 import {
   theoryReferenceTables,
   theoryTableSearchBlob,
   type TheoryRefTable,
 } from '../data/theoryReferenceTables'
-import { youtubeThumbnailUrl, youtubeWatchUrl } from '../lib/youtubeEmbed'
-import { useYoutubePlayer } from './YoutubeFloatingPlayer'
 import { ContentsIndex } from './ContentsIndex'
 
 function matchesQuery(haystack: string, q: string): boolean {
@@ -27,44 +20,9 @@ function slugify(text: string): string {
     .replace(/^-|-$/g, '')
 }
 
-function TheoryVideoChip({ video }: { video: TenseTheoryYoutube & { label?: string } }) {
-  const { openPlayer, active } = useYoutubePlayer()
-  const title = video.label?.trim() || 'YouTube lesson'
-  const isActive = active?.videoId === video.videoId
-
-  return (
-    <div className={`theory-video-chip${isActive ? ' is-active' : ''}`}>
-      <button
-        type="button"
-        className="theory-video-play"
-        onClick={() => openPlayer({ videoId: video.videoId, title })}
-        aria-label={`Play: ${title}`}
-      >
-        <img src={youtubeThumbnailUrl(video.videoId)} alt="" loading="lazy" decoding="async" />
-        <span className="theory-video-play-icon" aria-hidden>
-          <Play size={16} strokeWidth={2} fill="currentColor" />
-        </span>
-      </button>
-      <div className="theory-video-meta">
-        <button type="button" className="theory-video-title" onClick={() => openPlayer({ videoId: video.videoId, title })}>
-          {title}
-        </button>
-        <a href={youtubeWatchUrl(video.videoId)} target="_blank" rel="noopener noreferrer">
-          Open on YouTube
-        </a>
-      </div>
-    </div>
-  )
-}
-
 function TheoryRefTableCard({ table }: { table: TheoryRefTable }) {
   return (
     <section className="theory-card theory-ref-card" id={`theory-ref-${table.id}`}>
-      {table.image ? (
-        <div className="topic-card-media">
-          <img src={table.image} alt={table.imageAlt ?? ''} loading="lazy" decoding="async" />
-        </div>
-      ) : null}
       <h3>{table.title}</h3>
       {table.note ? <p className="theory-ref-note">{table.note}</p> : null}
       <div className="theory-ref-wrap">
@@ -95,22 +53,24 @@ function TheoryRefTableCard({ table }: { table: TheoryRefTable }) {
   )
 }
 
-export function TenseTheoryPage() {
+type TenseTheoryPageProps = {
+  onOpenVideos?: () => void
+}
+
+export function TenseTheoryPage({ onOpenVideos }: TenseTheoryPageProps) {
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
 
   const blocks = useMemo(() => {
     if (!q) return verbTenseTheoryBlocks
     return verbTenseTheoryBlocks.filter((b) =>
-      matchesQuery([b.title, b.formula, b.usage, b.example, b.youtube.label ?? ''].join('\n'), q),
+      matchesQuery([b.title, b.formula, b.usage, b.example].join('\n'), q),
     )
   }, [q])
 
   const extras = useMemo(() => {
     if (!q) return verbTenseTheoryExtra
-    return verbTenseTheoryExtra.filter((x) =>
-      matchesQuery([x.title, x.body, x.youtube?.label ?? ''].join('\n'), q),
-    )
+    return verbTenseTheoryExtra.filter((x) => matchesQuery([x.title, x.body].join('\n'), q))
   }, [q])
 
   const tables = useMemo(() => {
@@ -118,23 +78,15 @@ export function TenseTheoryPage() {
     return theoryReferenceTables.filter((t) => matchesQuery(theoryTableSearchBlob(t), q))
   }, [q])
 
-  const showFeatured =
-    !q ||
-    matchesQuery(
-      [verbTenseTheoryFeaturedVideo.label, 'overview', 'all tenses'].join(' '),
-      q,
-    )
-
-  const empty = !showFeatured && blocks.length === 0 && extras.length === 0 && tables.length === 0
+  const empty = blocks.length === 0 && extras.length === 0 && tables.length === 0
 
   const indexItems = useMemo(() => {
     const items: { id: string; label: string }[] = []
     for (const t of tables) items.push({ id: `theory-ref-${t.id}`, label: t.title })
-    if (showFeatured) items.push({ id: 'theory-overview', label: 'All tenses (overview)' })
     for (const b of blocks) items.push({ id: `theory-${b.id}`, label: b.title.replace(/\*/g, '') })
     for (const x of extras) items.push({ id: `theory-extra-${slugify(x.title)}`, label: x.title })
     return items
-  }, [tables, showFeatured, blocks, extras])
+  }, [tables, blocks, extras])
 
   return (
     <div className="theory-page page">
@@ -150,21 +102,25 @@ export function TenseTheoryPage() {
           <h1>
             Tense formulas<span className="accent-dot">.</span>
           </h1>
-          <p>Quick reference — subjects, helpers, and verb tense formulas. Search anything.</p>
+          <p>Quick reference — subjects, helpers, and verb tense formulas. Videos live in the Videos page.</p>
         </div>
         <div className="theory-hero-icon" aria-hidden>
           <GraduationCap size={28} strokeWidth={1.8} />
         </div>
       </section>
 
-      <figure className="topic-hero-media">
-        <img
-          src="/topics/theory-hero.png"
-          alt="Study desk with notebook and warm lamp"
-          loading="eager"
-          decoding="async"
-        />
-      </figure>
+      {onOpenVideos ? (
+        <aside className="theory-videos-cta">
+          <div>
+            <strong>Tense lesson videos</strong>
+            <p>Watch overview and per-tense lessons in Videos → Verb tenses &amp; grammar.</p>
+          </div>
+          <button type="button" className="button button-secondary" onClick={onOpenVideos}>
+            <Clapperboard size={16} strokeWidth={1.8} aria-hidden />
+            Open Videos
+          </button>
+        </aside>
+      ) : null}
 
       <label className="theory-search">
         <Search size={18} strokeWidth={1.8} aria-hidden />
@@ -194,31 +150,27 @@ export function TenseTheoryPage() {
             </div>
           ) : null}
 
-          {showFeatured ? (
-            <section className="theory-card theory-card-featured" id="theory-overview">
-              <span className="eyebrow">OVERVIEW</span>
-              <h2>All tenses</h2>
-              <TheoryVideoChip video={verbTenseTheoryFeaturedVideo} />
-            </section>
+          {blocks.length > 0 ? (
+            <div className="theory-tenses-block">
+              <h2 className="theory-extras-title">Tense formulas</h2>
+              {blocks.map((b) => (
+                <section key={b.id} className="theory-card" id={`theory-${b.id}`}>
+                  <h2>
+                    <MarkdownLite text={b.title} />
+                  </h2>
+                  <div className="theory-formula">
+                    <MarkdownFormula text={b.formula} />
+                  </div>
+                  <p className="theory-use">
+                    <span>Use:</span> <MarkdownLite text={b.usage} />
+                  </p>
+                  <p className="theory-eg">
+                    <span>e.g.</span> <MarkdownLite text={b.example} />
+                  </p>
+                </section>
+              ))}
+            </div>
           ) : null}
-
-          {blocks.map((b) => (
-            <section key={b.id} className="theory-card" id={`theory-${b.id}`}>
-              <h2>
-                <MarkdownLite text={b.title} />
-              </h2>
-              <div className="theory-formula">
-                <MarkdownFormula text={b.formula} />
-              </div>
-              <p className="theory-use">
-                <span>Use:</span> <MarkdownLite text={b.usage} />
-              </p>
-              <p className="theory-eg">
-                <span>e.g.</span> <MarkdownLite text={b.example} />
-              </p>
-              <TheoryVideoChip video={b.youtube} />
-            </section>
-          ))}
 
           {extras.length > 0 ? (
             <div className="theory-extras">
@@ -241,7 +193,6 @@ export function TenseTheoryPage() {
                         </p>
                       ))}
                   </div>
-                  {x.youtube ? <TheoryVideoChip video={x.youtube} /> : null}
                 </section>
               ))}
             </div>
