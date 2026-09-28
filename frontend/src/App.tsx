@@ -24,6 +24,7 @@ import { VerbListsPage } from './components/VerbListsPage'
 import { TopicsFlow } from './components/TopicsFlow'
 import { StoriesPage } from './components/StoriesPage'
 import { FluencyPage } from './components/FluencyPage'
+import { LevelsPage } from './components/LevelsPage'
 import { YoutubePlayerProvider } from './components/YoutubeFloatingPlayer'
 import { DictionaryRequestError, type WordDefinitionDto } from './types/dictionary'
 import type { AnkiCard } from './types/anki'
@@ -293,6 +294,8 @@ function App() {
         {screen === 'stories' ? <StoriesPage /> : null}
 
         {screen === 'fluency' ? <FluencyPage /> : null}
+
+        {screen === 'levels' ? <LevelsPage /> : null}
 
         {screen === 'interview' ? <InterviewPracticeScreen onClose={() => setScreen('workspace')} /> : null}
       </AppShell>

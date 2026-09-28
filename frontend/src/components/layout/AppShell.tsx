@@ -5,6 +5,7 @@ import {
   BookOpen,
   Clapperboard,
   Clock3,
+  GraduationCap,
   Layers,
   LayoutGrid,
   ListTree,
@@ -24,6 +25,7 @@ export type AppScreen =
   | 'topics'
   | 'stories'
   | 'fluency'
+  | 'levels'
   | 'interview'
 
 type AppShellProps = {
@@ -61,6 +63,7 @@ export function AppShell({
     { id: 'topics', label: 'Topics', icon: LayoutGrid },
     { id: 'stories', label: 'Stories', icon: BookMarked },
     { id: 'fluency', label: 'Fluency', icon: AudioLines },
+    { id: 'levels', label: 'Levels', icon: GraduationCap },
     { id: 'videos', label: 'Videos', icon: Clapperboard },
     { id: 'interview', label: 'Interview', icon: Mic },
   ]
