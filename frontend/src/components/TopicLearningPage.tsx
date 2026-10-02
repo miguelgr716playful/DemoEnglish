@@ -13,6 +13,7 @@ import {
   type TopicTable,
 } from '../data/weatherEnglish'
 import { ContentsIndex } from './ContentsIndex'
+import { SpokenGuidePanel } from './SpokenGuidePanel'
 
 function matchesQuery(haystack: string, q: string): boolean {
   return haystack.toLowerCase().includes(q)
@@ -75,6 +76,7 @@ type TopicLearningPageProps = {
   searchPlaceholder: string
   heroImage?: string
   heroImageAlt?: string
+  spokenGuide?: string
   extra?: ReactNode
 }
 
@@ -88,6 +90,7 @@ export function TopicLearningPage({
   searchPlaceholder,
   heroImage,
   heroImageAlt = '',
+  spokenGuide,
   extra,
 }: TopicLearningPageProps) {
   const [query, setQuery] = useState('')
@@ -103,7 +106,8 @@ export function TopicLearningPage({
     return phrases.filter((p) => matchesQuery(topicPhraseBlob(p), q))
   }, [q, phrases])
 
-  const empty = visibleTables.length === 0 && visiblePhrases.length === 0
+  const guideVisible = Boolean(spokenGuide && (!q || spokenGuide.toLowerCase().includes(q)))
+  const empty = !guideVisible && visibleTables.length === 0 && visiblePhrases.length === 0
 
   return (
     <div className="topic-page page">
@@ -145,6 +149,10 @@ export function TopicLearningPage({
       </label>
 
       {extra}
+
+      {guideVisible && spokenGuide ? (
+        <SpokenGuidePanel title={`How to use ${title}`} text={spokenGuide} />
+      ) : null}
 
       {empty ? (
         <p className="topic-empty">No results for “{query.trim()}”.</p>

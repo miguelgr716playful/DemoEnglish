@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import type { TopicPhrase, TopicTable } from './weatherEnglish'
 import { weatherPhrases, weatherTables } from './weatherEnglish'
+import { weatherSpokenGuide } from './weatherSpokenGuide'
 import { vacationPhrases, vacationTables } from './vacationsEnglish'
 import {
   foodPhrases,
@@ -43,6 +44,8 @@ export type TopicDefinition = {
   searchPlaceholder: string
   heroImage?: string
   heroImageAlt?: string
+  /** Long spoken walkthrough, written to be read aloud. */
+  spokenGuide?: string
 }
 
 export const topicCatalog: TopicDefinition[] = [
@@ -56,6 +59,7 @@ export const topicCatalog: TopicDefinition[] = [
     searchPlaceholder: 'Search weather (e.g. rainy, forecast…)',
     heroImage: '/topics/weather-hero.png',
     heroImageAlt: 'Sky with sun, clouds, and light rain',
+    spokenGuide: weatherSpokenGuide,
   },
   {
     id: 'vacations',

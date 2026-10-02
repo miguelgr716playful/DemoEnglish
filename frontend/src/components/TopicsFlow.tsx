@@ -95,6 +95,7 @@ export function TopicsFlow() {
         searchPlaceholder={topic.searchPlaceholder}
         heroImage={topic.heroImage}
         heroImageAlt={topic.heroImageAlt}
+        spokenGuide={topic.spokenGuide}
       />
     </div>
   )
