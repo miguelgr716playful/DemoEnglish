@@ -55,8 +55,13 @@ export function SpokenGuidePanel({ title, text }: SpokenGuidePanelProps) {
   }, [supported])
 
   useEffect(() => {
-    if (!wordRange) return
-    bodyRef.current?.querySelector('.tts-word-highlight')?.scrollIntoView({ block: 'nearest' })
+    const box = bodyRef.current
+    const mark = box?.querySelector('.tts-word-highlight')
+    if (!box || !mark) return
+    const markRect = mark.getBoundingClientRect()
+    const boxRect = box.getBoundingClientRect()
+    if (markRect.top < boxRect.top) box.scrollTop -= boxRect.top - markRect.top
+    else if (markRect.bottom > boxRect.bottom) box.scrollTop += markRect.bottom - boxRect.bottom
   }, [wordRange])
 
   const speakFrom = (startIndex: number, token: number) => {
@@ -104,7 +109,7 @@ export function SpokenGuidePanel({ title, text }: SpokenGuidePanelProps) {
       <div className="school-panel-row">
         <div>
           <h2 id="topic-how-to-title">{title}</h2>
-          <p className="topic-guide-note">Press Read aloud and follow along. About one thousand words.</p>
+          <p className="topic-guide-note">Scroll inside this box to read it. Press Read aloud and follow along.</p>
         </div>
         {supported ? (
           <button
@@ -130,7 +135,7 @@ export function SpokenGuidePanel({ title, text }: SpokenGuidePanelProps) {
         ) : null}
       </div>
       <div className="topic-guide-body" ref={bodyRef}>
-        <HighlightedText text={text} range={wordRange} />
+        <HighlightedText className="topic-guide-text" text={text} range={wordRange} />
       </div>
     </section>
   )

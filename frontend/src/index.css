@@ -1708,12 +1708,31 @@ html[data-theme="dark"] .verbs-tabs button.active {
 }
 .topic-guide-body {
   margin: 0;
+  max-height: min(100lh, calc(100dvh - 220px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   white-space: pre-wrap;
   font-size: 15px;
   font-weight: 500;
   line-height: 1.7;
   color: var(--ink);
+  padding: 2px 14px 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--teal) transparent;
+}
+.topic-guide-text {
+  display: block;
   max-width: 68ch;
+}
+.topic-guide-body::-webkit-scrollbar {
+  width: 10px;
+}
+.topic-guide-body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--teal) 55%, var(--line));
+  border-radius: 999px;
+}
+.topic-guide-body::-webkit-scrollbar-track {
+  background: transparent;
 }
 .contents-index {
   margin-bottom: 8px;
