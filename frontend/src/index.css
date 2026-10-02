@@ -1708,7 +1708,7 @@ html[data-theme="dark"] .verbs-tabs button.active {
 }
 .topic-guide-body {
   margin: 0;
-  max-height: min(100lh, calc(100dvh - 220px));
+  max-height: 50lh;
   overflow-y: auto;
   overscroll-behavior: contain;
   white-space: pre-wrap;
